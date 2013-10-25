@@ -1,0 +1,11 @@
+Django==1.5.4
+dj-database-url==0.2.2
+oauthlib==0.6.0
+python-openid==2.2.5
+# Move this to the official python-social-auth when RunKeeper makes it to a realase
+git+git://github.com/JasonSanford/python-social-auth.git@runkeeper
+requests==2.0.1
+requests-oauthlib==0.4.0
+six==1.4.1
+wsgiref==0.1.2
+psycopg2==2.5.1
