@@ -9,3 +9,4 @@ requests-oauthlib==0.4.0
 six==1.4.1
 wsgiref==0.1.2
 psycopg2==2.5.1
+gunicorn==18.0
