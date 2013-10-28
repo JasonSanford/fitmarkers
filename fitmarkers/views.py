@@ -1,5 +1,15 @@
-from django.http import HttpResponse
+from django.contrib.auth import logout as auth_logout
+from django.shortcuts import render, redirect
 
 
 def home(request):
-    return HttpResponse('Yo dawg.<br><br><a href="/login/runkeeper">Log in</a>')
+    return render(request, 'index.html')
+
+
+def login(request):
+    return render(request, 'login.html')
+
+
+def logout(request):
+    auth_logout(request)
+    return redirect('fitmarkers.views.home')

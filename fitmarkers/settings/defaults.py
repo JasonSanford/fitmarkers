@@ -66,6 +66,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    'static',
 )
 
 # List of finder classes that know how to find static files in
@@ -105,6 +106,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    'templates'
 )
 
 INSTALLED_APPS = (
@@ -128,6 +130,8 @@ AUTHENTICATION_BACKENDS = (
 
 SOCIAL_AUTH_RUNKEEPER_KEY = os.environ.get('SOCIAL_AUTH_RUNKEEPER_KEY')
 SOCIAL_AUTH_RUNKEEPER_SECRET = os.environ.get('SOCIAL_AUTH_RUNKEEPER_SECRET')
+
+LOGIN_REDIRECT_URL = '/user/dashboard/'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 

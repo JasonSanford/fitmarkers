@@ -7,6 +7,9 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
     url(r'^$', 'fitmarkers.views.home', name='home'),
+    url(r'^login$', 'fitmarkers.views.login', name='login'),
+    url(r'^logout$', 'fitmarkers.views.logout', name='logout'),
+    url(r'^user/', include('fitmarkers.user.urls')),
     # Examples:
     # url(r'^$', 'fitmarkers.views.home', name='home'),
     # url(r'^fitmarkers/', include('fitmarkers.foo.urls')),
