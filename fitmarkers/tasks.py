@@ -15,6 +15,12 @@ from utils import get_last_monday
 logger = logging.getLogger(__name__)
 
 
+def get_new_workouts_for_all_users():
+    users = User.objects.filter(is_active=True)
+    for user in users:
+        get_new_workouts_for_user(user)
+
+
 def get_new_workouts_for_user(user):
     last_monday = get_last_monday()
     social_auth_users = UserSocialAuth.objects.filter(user=user)
