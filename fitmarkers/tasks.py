@@ -32,6 +32,7 @@ def get_new_runkeeper_workouts(social_auth_users, since_date):
         activities_response = rk_api.get('/fitnessActivities?noEarlierThan={0}-{1}-{2}'.format(since_date.year, since_date.month, since_date.day))
         raw_workouts = activities_response.json()['items']
         existing_workout_count = 0
+        no_path_workout_count = 0
         workouts_to_create = {}
         for raw_workout in raw_workouts:
             uri_parts = raw_workout['uri'].split('fitnessActivities/')
@@ -46,10 +47,14 @@ def get_new_runkeeper_workouts(social_auth_users, since_date):
                 continue
             except Workout.DoesNotExist:
                 pass
-            raw_workout_full = rk_api.get(raw_workout['uri']).json()
-            workouts_to_create[workout_id] = raw_workout_full
+            if raw_workout['has_path']:
+                raw_workout_full = rk_api.get(raw_workout['uri']).json()
+                workouts_to_create[workout_id] = raw_workout_full
+            else:
+                no_path_workout_count += 1
         logger.info('Creating {0} workouts for {1}.'.format(len(workouts_to_create), sau.user))
-        logger.info('Ignoring {0} workouts for {1}'.format(existing_workout_count, sau.user))
+        logger.info('Ignoring {0} workouts for {1} because they already exist.'.format(existing_workout_count, sau.user))
+        logger.info('Ignoring {0} workouts for {1} because there is no path.'.format(no_path_workout_count, sau.user))
         #create_workouts.apply_async(raw_workouts)
         create_workouts(sau, workouts_to_create, Providers.RUNKEEPER)
 
