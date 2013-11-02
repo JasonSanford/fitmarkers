@@ -1,6 +1,8 @@
 import os
+from datetime import timedelta
 
 import dj_database_url
+import djcelery
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -118,6 +120,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'social.apps.django_app.default',
     'fitmarkers',
+    'kombu.transport.django',
+    'djcelery',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -135,6 +139,21 @@ SOCIAL_AUTH_RUNKEEPER_SECRET = os.environ.get('SOCIAL_AUTH_RUNKEEPER_SECRET')
 LOGIN_REDIRECT_URL = '/user/dashboard/'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+
+BROKER_BACKEND = 'django'
+CELERY_TIMEZONE = 'UTC'
+BROKER_URL = 'django://'
+
+djcelery.setup_loader()
+
+CELERY_IMPORTS = ('fitmarkers.tasks',)
+
+CELERYBEAT_SCHEDULE = {
+    'get_new_workouts_for_all_users': {
+        'task': 'get_new_workouts_for_all_users',
+        'schedule': timedelta(minutes=1),
+    },
+}
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

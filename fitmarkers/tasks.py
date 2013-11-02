@@ -1,6 +1,7 @@
 import json
 import logging
 
+from celery import task
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import GEOSGeometry
 from social.apps.django_app.default.models import UserSocialAuth
@@ -15,12 +16,14 @@ from utils import get_last_monday
 logger = logging.getLogger(__name__)
 
 
+@task(name='get_new_workouts_for_all_users')
 def get_new_workouts_for_all_users():
     users = User.objects.filter(is_active=True)
     for user in users:
         get_new_workouts_for_user(user)
 
 
+@task(name='get_new_workouts_for_user')
 def get_new_workouts_for_user(user):
     last_monday = get_last_monday()
     social_auth_users = UserSocialAuth.objects.filter(user=user)
@@ -32,6 +35,7 @@ def get_new_workouts_for_user(user):
     #get_new_mmf_workouts(mmf_users, last_monday)
 
 
+@task(name='get_new_runkeeper_workouts')
 def get_new_runkeeper_workouts(social_auth_users, since_date):
     for sau in social_auth_users:
         rk_api = RunKeeperAPI(sau)
@@ -65,6 +69,7 @@ def get_new_runkeeper_workouts(social_auth_users, since_date):
         create_workouts(sau, workouts_to_create, Providers.RUNKEEPER)
 
 
+@task(name='create_workouts')
 def create_workouts(social_auth_user, raw_workouts, provider):
     for provider_id, raw_workout in raw_workouts.iteritems():
         path_geojson = path_to_geojson(raw_workout['path'])
@@ -82,5 +87,6 @@ def create_workouts(social_auth_user, raw_workouts, provider):
         logger.info('Created {0} for {1}'.format(workout, social_auth_user.user))
 
 
+@task(name='get_new_mmf_workouts')
 def get_new_mmf_workouts(social_auth_users, since_date):
     pass
