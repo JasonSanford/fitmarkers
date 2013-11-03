@@ -4,9 +4,10 @@ import logging
 from celery import task
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D
 from social.apps.django_app.default.models import UserSocialAuth
 
-from models.workout import Workout
+from models import Workout, Marker, WorkoutMarker
 from remote import Providers
 from remote.oauth.runkeeper import RunKeeperAPI
 from remote.runkeeper.utils import path_to_geojson, date_string_to_datetime
@@ -84,9 +85,21 @@ def create_workouts(social_auth_user, raw_workouts, provider):
         }
         workout = Workout(**workout_kwargs)
         workout.save()
+        check_workout_for_markers.apply_async((workout,))
         logger.info('Created {0} for {1}'.format(workout, social_auth_user.user))
 
 
 @task(name='get_new_mmf_workouts')
 def get_new_mmf_workouts(social_auth_users, since_date):
     pass
+
+
+@task(name='check_workout_for_markers')
+def check_workout_for_markers(workout):
+    markers_on_workout = Marker.objects.filter(geom__distance_lte=(workout.geom, D(m=20)))
+    for marker_on_workout in markers_on_workout:
+        workout_marker = WorkoutMarker(workout=workout, marker=marker_on_workout)
+        workout_marker.save()
+    workout.processed = True
+    workout.save()
+    logging.info('Created {0} WorkoutMarkers for {1}'.format(len(markers_on_workout), workout))

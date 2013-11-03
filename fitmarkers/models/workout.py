@@ -13,7 +13,8 @@ class Workout(behaviors.Timestampable, geo_models.Model):
     provider = models.IntegerField()
     provider_id = models.IntegerField()
     start_datetime = models.DateTimeField()
-    duration =  models.IntegerField()
+    duration = models.IntegerField()
+    processed = models.BooleanField(default=False)
     geom = geo_models.LineStringField()
 
     objects = geo_models.GeoManager()
