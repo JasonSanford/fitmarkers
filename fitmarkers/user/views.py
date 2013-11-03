@@ -42,7 +42,7 @@ def workout(request, workout_id):
             'geometry': {'type': 'Point', 'coordinates': [wm.marker.geom.x, wm.marker.geom.y]}
         }
         workout_markers_geojson['features'].append(wm_feature)
-    print dir(workout)
+
     context = {
         'workout': workout,
         'workout_geojson': workout.geojson,
