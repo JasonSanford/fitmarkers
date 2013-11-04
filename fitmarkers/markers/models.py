@@ -1,8 +1,8 @@
 from django.contrib.gis.db import models as geo_models
 from django.db import models
 
-import behaviors
-from . import Workout
+from ..models import Workout, behaviors
+
 
 class Marker(behaviors.Timestampable, geo_models.Model):
     class Meta:

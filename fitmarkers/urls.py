@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     url(r'^login$', 'fitmarkers.views.login', name='login'),
     url(r'^logout$', 'fitmarkers.views.logout', name='logout'),
     url(r'^user/', include('fitmarkers.user.urls')),
+    url(r'^markers/', include('fitmarkers.markers.urls')),
     # Examples:
     # url(r'^$', 'fitmarkers.views.home', name='home'),
     # url(r'^fitmarkers/', include('fitmarkers.foo.urls')),

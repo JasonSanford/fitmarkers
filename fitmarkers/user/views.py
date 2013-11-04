@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
-from ..models import Workout, WorkoutMarker
+from ..models import Workout
+from ..markers.models import WorkoutMarker
 
 
 @login_required

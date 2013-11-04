@@ -7,7 +7,8 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from social.apps.django_app.default.models import UserSocialAuth
 
-from models import Workout, Marker, WorkoutMarker
+from models import Workout
+from markers.models import Marker, WorkoutMarker
 from remote import Providers
 from remote.oauth.runkeeper import RunKeeperAPI
 from remote.runkeeper.utils import path_to_geojson, date_string_to_datetime
