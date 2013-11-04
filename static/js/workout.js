@@ -1,4 +1,16 @@
 (function() {
+    var mediumIconLight = L.icon({
+        iconUrl: 'http://api.tiles.mapbox.com/v3/marker/pin-m+94b7cb.png',
+        iconSize: [30, 70],
+        iconAnchor: [16, 37],
+        popupAnchor: [0, -28]
+    });
+    var mediumIconDarkStar = L.icon({
+        iconUrl: 'http://api.tiles.mapbox.com/v3/marker/pin-m-star+192e3a.png',
+        iconSize: [30, 70],
+        iconAnchor: [16, 37],
+        popupAnchor: [0, -28]
+    });
     var road_layer = new L.TileLayer('http://{s}.tiles.mapbox.com/v3/jcsanford.map-qh86l7s4/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 subdomains: ['a', 'b', 'c', 'd'],
@@ -22,7 +34,11 @@
                 opacity: 0.8
             }
         });
-        workout_markers_layer = new L.GeoJSON(fm.workout_markers, {});
+        workout_markers_layer = new L.GeoJSON(fm.workout_markers, {
+            pointToLayer: function (feature, latLng) {
+                return L.marker(latLng, {icon: mediumIconDarkStar});
+            }
+        });
     map
         .addLayer(workout_layer)
         .addLayer(workout_markers_layer)
