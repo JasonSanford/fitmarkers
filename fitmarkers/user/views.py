@@ -38,7 +38,8 @@ def workout(request, workout_id):
             'properties': {
                 'name': wm.marker.name,
                 'point_value': wm.marker.point_value,
-                'description': wm.marker.description
+                'description': wm.marker.description,
+                'marker_id': wm.marker.id,
             },
             'geometry': {'type': 'Point', 'coordinates': [wm.marker.geom.x, wm.marker.geom.y]}
         }

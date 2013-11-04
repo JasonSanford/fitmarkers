@@ -22,13 +22,20 @@ def search(request):
             'properties': {
                 'name': marker.name,
                 'point_value': marker.point_value,
-                'description': marker.description
+                'description': marker.description,
+                'id': marker.id,
             },
             'geometry': json.loads(marker.geojson),
             'id': marker.id,
         } for marker in markers
     ]
     response = {'type': 'FeatureCollection', 'features': json_features, 'count': len(markers)}
-    content = json.dumps(response)
 
-    return HttpResponse(content, content_type='application/json')
+    content = json.dumps(response)
+    content_type = 'application/json'
+
+    if 'callback' in request.GET and len(request.GET['callback']):
+        content = '{0}({1})'.format(request.GET['callback'], content)
+        content_type = 'text/javascript'
+
+    return HttpResponse(content, content_type=content_type)

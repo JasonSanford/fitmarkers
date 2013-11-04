@@ -14,6 +14,7 @@ fm.workout_markers = {{ workout_markers_geojson|safe }};
 fm.workout = {{ workout_geojson|safe }};
 </script>
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+<script src="{{ STATIC_URL }}js/lvector.js"></script>
 <script src="{{ STATIC_URL }}js/workout.js"></script>
 {% endblock %}
 
