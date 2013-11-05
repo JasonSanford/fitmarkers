@@ -3,7 +3,7 @@ import json
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
 
-from fitmarkers.models import Marker
+from fitmarkers.markers.models import Marker
 
 
 class Command(BaseCommand):
