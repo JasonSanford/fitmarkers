@@ -9,7 +9,8 @@ kombu==2.5.16
 oauthlib==0.6.0
 python-openid==2.2.5
 # Move this to the official python-social-auth when RunKeeper makes it to a realase
-git+git://github.com/JasonSanford/python-social-auth.git@runkeeper
+#git+git://github.com/JasonSanford/python-social-auth.git@runkeeper
+python-social-auth==0.1.15
 pytz==2013.7
 requests==2.0.1
 requests-oauthlib==0.4.0

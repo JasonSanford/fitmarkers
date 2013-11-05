@@ -120,6 +120,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'social.apps.django_app.default',
     'fitmarkers',
+    'fitmarkers.markers',
     'kombu.transport.django',
     'djcelery',
     # Uncomment the next line to enable the admin:
