@@ -131,11 +131,15 @@ INSTALLED_APPS = (
 
 AUTHENTICATION_BACKENDS = (
     'social.backends.runkeeper.RunKeeperOAuth2',
+    'social.backends.mapmyfitness.MapMyFitnessOAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
 
 SOCIAL_AUTH_RUNKEEPER_KEY = os.environ.get('SOCIAL_AUTH_RUNKEEPER_KEY')
 SOCIAL_AUTH_RUNKEEPER_SECRET = os.environ.get('SOCIAL_AUTH_RUNKEEPER_SECRET')
+
+SOCIAL_AUTH_MAPMYFITNESS_KEY = os.environ.get('SOCIAL_AUTH_MAPMYFITNESS_KEY')
+SOCIAL_AUTH_MAPMYFITNESS_SECRET = os.environ.get('SOCIAL_AUTH_MAPMYFITNESS_SECRET')
 
 LOGIN_REDIRECT_URL = '/user/dashboard/'
 
