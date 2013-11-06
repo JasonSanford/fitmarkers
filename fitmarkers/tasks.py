@@ -94,7 +94,7 @@ def get_new_mmf_workouts(social_auth_users, since_date):
     for sau in social_auth_users:
         mmf_api = MapMyFitnessAPI(social_auth_user=sau)
         url_params = {
-            'user': 9118466,
+            'user': sau.uid,
             'created_after': '{0}-{1}-{2}T00:00:00+00:00'.format(since_date.year, since_date.month, since_date.day)
         }
         encoded_params = urllib.urlencode(url_params)
