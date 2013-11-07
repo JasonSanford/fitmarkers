@@ -2,6 +2,9 @@ import datetime
 
 from django.utils.timezone import utc
 
+from fitmarkers.models import Workout
+from fitmarkers.exceptions import InvalidWorkoutTypeException
+
 
 def path_to_geojson(path):
     linestring = {
@@ -31,3 +34,17 @@ def date_string_to_datetime(date_string):
 
     dt = datetime.datetime(year, month, day, hours, minutes, seconds, tzinfo=utc)
     return dt
+
+
+def type_string_to_int(s):
+    runkeeper_types = (
+        ('Running', Workout.TYPE_RUN),
+        ('Walking', Workout.TYPE_WALK),
+        ('Cycling', Workout.TYPE_RIDE),
+    )
+
+    for name, workout_type in runkeeper_types:
+        if s == name:
+            return workout_type
+
+    raise InvalidWorkoutTypeException('{0} is not a valid workout type.'.format(s))

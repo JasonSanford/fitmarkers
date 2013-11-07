@@ -8,6 +8,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
 from social.apps.django_app.default.models import UserSocialAuth
 
+from exceptions import InvalidWorkoutTypeException
 from models import Workout
 from markers.models import Marker, WorkoutMarker
 from remote import Providers
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 def get_new_workouts_for_all_users():
     users = User.objects.filter(is_active=True)
     for user in users:
-        get_new_workouts_for_user(user)
+        get_new_workouts_for_user.delay(user)
 
 
 @task(name='get_new_workouts_for_user')
@@ -36,8 +37,8 @@ def get_new_workouts_for_user(user):
     runkeeper_users = [sau for sau in social_auth_users if sau.provider == 'runkeeper']
     mmf_users = [sau for sau in social_auth_users if sau.provider == 'mapmyfitness']
 
-    get_new_runkeeper_workouts(runkeeper_users, last_monday)
-    get_new_mmf_workouts(mmf_users, last_monday)
+    get_new_runkeeper_workouts.delay(runkeeper_users, last_monday)
+    get_new_mmf_workouts.delay(mmf_users, last_monday)
 
 
 @task(name='get_new_runkeeper_workouts')
@@ -64,20 +65,25 @@ def get_new_runkeeper_workouts(social_auth_users, since_date):
                 pass
             if raw_workout['has_path']:
                 raw_workout_full = rk_api.get(raw_workout['uri']).json()
-                workouts_to_create[workout_id] = {
-                    'user': sau.user,
-                    'provider': Providers.RUNKEEPER,
-                    'provider_id': workout_id,
-                    'start_datetime': rk_utils.date_string_to_datetime(raw_workout['start_time']),
-                    'duration': int(raw_workout['duration']),
-                    'geom': GEOSGeometry(json.dumps(rk_utils.path_to_geojson(raw_workout_full['path']))),
-                }
+                try:
+                    workouts_to_create[workout_id] = {
+                        'user': sau.user,
+                        'provider': Providers.RUNKEEPER,
+                        'provider_id': workout_id,
+                        'type': rk_utils.type_string_to_int(raw_workout['type']),
+                        'start_datetime': rk_utils.date_string_to_datetime(raw_workout['start_time']),
+                        'duration': int(raw_workout['duration']),
+                        'geom': GEOSGeometry(json.dumps(rk_utils.path_to_geojson(raw_workout_full['path']))),
+                    }
+                except InvalidWorkoutTypeException as exc:
+                    logger.error('Invalid workout type for User: {0}, Provider Id: {1}. - {2}'.format(sau.user, Providers.RUNKEEPER, str(exc)))
+                    continue
             else:
                 no_path_workout_count += 1
         logger.info('Creating {0} workouts for {1}.'.format(len(workouts_to_create), sau.user))
         logger.info('Ignoring {0} workouts for {1} because they already exist.'.format(existing_workout_count, sau.user))
         logger.info('Ignoring {0} workouts for {1} because there is no path.'.format(no_path_workout_count, sau.user))
-        create_workouts(sau, workouts_to_create, Providers.RUNKEEPER)
+        create_workouts.delay(sau, workouts_to_create, Providers.RUNKEEPER)
 
 
 @task(name='create_workouts')
@@ -117,20 +123,25 @@ def get_new_mmf_workouts(social_auth_users, since_date):
                 pass
             if raw_workout['has_time_series']:
                 workout_route = mmf_api.get('{0}?field_set=detailed'.format(raw_workout['_links']['route'][0]['href'])).json()
-                workouts_to_create[workout_id] = {
-                    'user': sau.user,
-                    'provider': Providers.MAPMYFITNESS,
-                    'provider_id': workout_id,
-                    'start_datetime': mmf_utils.date_string_to_datetime(raw_workout['start_datetime']),
-                    'duration': int(raw_workout['aggregates']['active_time_total']),
-                    'geom': GEOSGeometry(json.dumps(mmf_utils.points_to_geojson(workout_route['points']))),
-                }
+                try:
+                    workouts_to_create[workout_id] = {
+                        'user': sau.user,
+                        'provider': Providers.MAPMYFITNESS,
+                        'provider_id': workout_id,
+                        'type': mmf_utils.type_dict_to_int(raw_workout['_links']['activity_type'][0], mmf_api),
+                        'start_datetime': mmf_utils.date_string_to_datetime(raw_workout['start_datetime']),
+                        'duration': int(raw_workout['aggregates']['active_time_total']),
+                        'geom': GEOSGeometry(json.dumps(mmf_utils.points_to_geojson(workout_route['points']))),
+                    }
+                except InvalidWorkoutTypeException as exc:
+                    logger.error('Invalid workout type for User: {0}, Provider Id: {1}. - {2}'.format(sau.user, Providers.MAPMYFITNESS, str(exc)))
+                    continue
             else:
                 no_time_series_workout_count += 1
         logger.info('Creating {0} workouts for {1}.'.format(len(workouts_to_create), sau.user))
         logger.info('Ignoring {0} workouts for {1} because they already exist.'.format(existing_workout_count, sau.user))
         logger.info('Ignoring {0} workouts for {1} because there is no time series.'.format(no_time_series_workout_count, sau.user))
-        create_workouts(sau, workouts_to_create, Providers.RUNKEEPER)
+        create_workouts.delay(sau, workouts_to_create, Providers.RUNKEEPER)
 
 
 @task(name='check_workout_for_markers')
@@ -141,4 +152,4 @@ def check_workout_for_markers(workout):
         workout_marker.save()
     workout.processed = True
     workout.save()
-    logging.info('Created {0} WorkoutMarkers for {1}'.format(len(markers_on_workout), workout))
+    logger.info('Created {0} WorkoutMarkers for {1}'.format(len(markers_on_workout), workout))

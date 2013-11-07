@@ -1,0 +1,2 @@
+class InvalidWorkoutTypeException(Exception):
+    pass
