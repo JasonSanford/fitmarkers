@@ -3,6 +3,7 @@ from django.contrib.gis.db import models as geo_models
 from django.db import models
 
 import behaviors
+from ..utils import get_last_monday
 
 
 class Workout(behaviors.Timestampable, geo_models.Model):
@@ -16,8 +17,16 @@ class Workout(behaviors.Timestampable, geo_models.Model):
         (TYPE_WALK, 'Walk'),
     )
 
+    RUNKEEPER = 1
+    MAPMYFITNESS = 2
+
+    PROVIDER_CHOICES = (
+        (RUNKEEPER, 'RunKeeper'),
+        (MAPMYFITNESS, 'MapMyFitness'),
+    )
+
     user = models.ForeignKey(User)
-    provider = models.IntegerField()
+    provider = models.IntegerField(choices=PROVIDER_CHOICES)
     provider_id = models.IntegerField()
     type = models.IntegerField(choices=TYPE_CHOICES)
     start_datetime = models.DateTimeField()
@@ -26,6 +35,10 @@ class Workout(behaviors.Timestampable, geo_models.Model):
     geom = geo_models.LineStringField()
 
     objects = geo_models.GeoManager()
+
+    @property
+    def is_this_week(self):
+        return self.start_datetime > get_last_monday()
 
     class Meta:
         app_label = 'fitmarkers'
