@@ -2,9 +2,11 @@ Django==1.5.4
 amqp==1.0.13
 anyjson==0.3.3
 billiard==2.7.3.34
+boto==2.15.0
 celery==3.0.24
 dj-database-url==0.2.2
 django-celery==3.0.23
+django-storages==1.1.8
 kombu==2.5.16
 oauthlib==0.6.0
 python-openid==2.2.5

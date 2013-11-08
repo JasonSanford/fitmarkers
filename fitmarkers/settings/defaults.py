@@ -123,6 +123,7 @@ INSTALLED_APPS = (
     'fitmarkers.markers',
     'kombu.transport.django',
     'djcelery',
+    'storages',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -134,6 +135,12 @@ AUTHENTICATION_BACKENDS = (
     'social.backends.mapmyfitness.MapMyFitnessOAuth',
     'django.contrib.auth.backends.ModelBackend',
 )
+
+STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'fitmarkers'
 
 SOCIAL_AUTH_RUNKEEPER_KEY = os.environ.get('SOCIAL_AUTH_RUNKEEPER_KEY')
 SOCIAL_AUTH_RUNKEEPER_SECRET = os.environ.get('SOCIAL_AUTH_RUNKEEPER_SECRET')
