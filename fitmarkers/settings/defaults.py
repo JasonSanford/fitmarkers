@@ -4,7 +4,7 @@ from datetime import timedelta
 import dj_database_url
 import djcelery
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -208,12 +208,12 @@ LOGGING = {
         },
         'fitmarkers': {
             'handlers': ['console'],
-            'level': 'ERROR',
+            'level': 'INFO',
             'propagate': False,
         },
         '': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': 'ERROR',
             'propagate': True,
         },
     }
