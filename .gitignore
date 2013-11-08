@@ -2,3 +2,4 @@
 venv
 celerybeat-schedule.db
 logs
+*.pyc
