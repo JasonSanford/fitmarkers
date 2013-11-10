@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>A {{ workout.get_type_display }} from {{ workout.get_provider_display }} on {% if workout.is_this_week %}{{ workout.start_datetime|date:"l" }}{% else %}{{ workout.start_datetime|date:"M d, Y" }}{% endif %}</h2>
+<h2>{{ workout.name }}</h2>
 
 <div id="map-container" style="height: 500px; border: 1px solid #999999;"></div>
 
