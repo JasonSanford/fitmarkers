@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
-from ..models import Workout
 from ..markers.models import WorkoutMarker
+from ..models import Workout
+from ..utils import get_first_day_of_month
 
 
 @login_required
@@ -15,7 +16,14 @@ def user(request):
 
 @login_required
 def dashboard(request):
-    return render(request, 'user_dashboard.html')
+    first_day_of_month = get_first_day_of_month()
+    monthly_workouts = Workout.objects.filter(user=request.user, start_datetime__gte=first_day_of_month).order_by('-start_datetime').select_related('WorkoutMarker')
+
+    context = {
+        'monthly_workouts': monthly_workouts,
+    }
+
+    return render(request, 'user_dashboard.html', context)
 
 
 @login_required
