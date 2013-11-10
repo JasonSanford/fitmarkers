@@ -40,6 +40,22 @@ class Workout(behaviors.Timestampable, geo_models.Model):
     def is_this_week(self):
         return self.start_datetime > get_last_monday()
 
+    @property
+    def display_date(self):
+        #
+        # For the current week (since the past Monday) show just the day.
+        # Anything before that, show "Feb 28, 2013"
+        #
+        if self.is_this_week:
+            formatter = '%A'
+        else:
+            formatter = '%b %d, %Y'
+        return self.start_datetime.strftime(formatter)
+
+    @property
+    def name(self):
+        return 'A {0} from {1} on {2}'.format(self.get_type_display(), self.get_provider_display(), self.display_date)
+
     class Meta:
         app_label = 'fitmarkers'
 
