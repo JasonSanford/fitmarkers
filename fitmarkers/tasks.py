@@ -16,7 +16,7 @@ from remote.oauth.runkeeper import RunKeeperAPI
 from remote.oauth.mapmyfitness import MapMyFitnessAPI
 from remote.runkeeper import utils as rk_utils
 from remote.mapmyfitness import utils as mmf_utils
-from utils import get_last_monday
+from utils import get_first_day_of_month
 
 
 logger = logging.getLogger(__name__)
@@ -31,14 +31,14 @@ def get_new_workouts_for_all_users():
 
 @task(name='get_new_workouts_for_user')
 def get_new_workouts_for_user(user):
-    last_monday = get_last_monday()
+    since_datetime = get_first_day_of_month()
     social_auth_users = UserSocialAuth.objects.filter(user=user)
     
     runkeeper_users = [sau for sau in social_auth_users if sau.provider == 'runkeeper']
     mmf_users = [sau for sau in social_auth_users if sau.provider == 'mapmyfitness']
 
-    get_new_runkeeper_workouts.delay(runkeeper_users, last_monday)
-    get_new_mmf_workouts.delay(mmf_users, last_monday)
+    get_new_runkeeper_workouts.delay(runkeeper_users, since_datetime)
+    get_new_mmf_workouts.delay(mmf_users, since_datetime)
 
 
 @task(name='get_new_runkeeper_workouts')
