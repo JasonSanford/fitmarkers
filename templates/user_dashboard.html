@@ -10,6 +10,7 @@
             <th>Date</th>
             <th>Type</th>
             <th>From</th>
+            <th>FitMarkers</th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +26,9 @@
             </td>
             <td>
                 {{ workout.get_provider_display }}
+            </td>
+            <td>
+                {{ workout.workout_marker_count }}
             </td>
         {% endfor %}
         </tr>

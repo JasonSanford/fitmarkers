@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 
 
 def home(request):
+    if request.user.is_authenticated() and 'force_home' not in request.GET:
+        return redirect('user_dashboard')
     return render(request, 'index.html')
 
 
