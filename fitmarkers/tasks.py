@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import urllib
@@ -9,6 +10,7 @@ from django.contrib.gis.measure import D
 from social.apps.django_app.default.models import UserSocialAuth
 
 from exceptions import InvalidWorkoutTypeException
+from leaderboards import create_or_update_entry
 from models import Workout
 from markers.models import Marker, WorkoutMarker
 from remote import Providers
@@ -83,7 +85,8 @@ def get_new_runkeeper_workouts(social_auth_users, since_date):
         logger.info('Creating {0} workouts for {1}.'.format(len(workouts_to_create), sau.user))
         logger.info('Ignoring {0} workouts for {1} because they already exist.'.format(existing_workout_count, sau.user))
         logger.info('Ignoring {0} workouts for {1} because there is no path.'.format(no_path_workout_count, sau.user))
-        create_workouts.delay(sau, workouts_to_create, Providers.RUNKEEPER)
+        if workouts_to_create:
+            create_workouts.delay(sau, workouts_to_create, Providers.RUNKEEPER)
 
 
 @task(name='create_workouts')
@@ -141,7 +144,8 @@ def get_new_mmf_workouts(social_auth_users, since_date):
         logger.info('Creating {0} workouts for {1}.'.format(len(workouts_to_create), sau.user))
         logger.info('Ignoring {0} workouts for {1} because they already exist.'.format(existing_workout_count, sau.user))
         logger.info('Ignoring {0} workouts for {1} because there is no time series.'.format(no_time_series_workout_count, sau.user))
-        create_workouts.delay(sau, workouts_to_create, Providers.RUNKEEPER)
+        if workouts_to_create:
+            create_workouts.delay(sau, workouts_to_create, Providers.RUNKEEPER)
 
 
 @task(name='check_workout_for_markers')
@@ -153,3 +157,39 @@ def check_workout_for_markers(workout):
     workout.processed = True
     workout.save()
     logger.info('Created {0} WorkoutMarkers for {1}'.format(len(markers_on_workout), workout))
+
+
+@task(name='update_leaderboards_for_user')
+def update_leaderboards_for_user(user):
+    """
+    Monthly
+    """
+    today = datetime.date.today()
+    first_of_month = get_first_day_of_month()
+
+    monthly_workouts = Workout.objects.filter(user=user, start_datetime__gte=first_of_month)
+    monthly_workouts_ids = monthly_workouts.values_list('id', flat=True)
+
+    monthly_workout_markers = WorkoutMarker.objects.filter(workout__id__in=monthly_workouts_ids).distinct('marker')
+
+    monthly_points = 0
+    for monthly_workout_marker in monthly_workout_markers:
+        monthly_points += monthly_workout_marker.marker.point_value
+
+    #print 'Monthly points for {0} is {1}.'.format(user, monthly_points)
+    create_or_update_entry(monthly_points, user.id, year=today.year, month=today.month)
+
+    """
+    All Time
+    """
+    all_time_workouts = Workout.objects.filter(user=user)
+    all_time_workouts_ids = all_time_workouts.values_list('id', flat=True)
+
+    all_time_workout_markers = WorkoutMarker.objects.filter(workout__id__in=all_time_workouts_ids).distinct('marker')
+
+    all_time_points = 0
+    for all_time_workout_marker in all_time_workout_markers:
+        all_time_points += all_time_workout_marker.marker.point_value
+
+    #print 'Monthly points for {0} is {1}.'.format(user, all_time_points)
+    create_or_update_entry(all_time_points, user.id, all_time=True)
