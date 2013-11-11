@@ -41,6 +41,7 @@ def type_string_to_int(s):
         ('Running', Workout.TYPE_RUN),
         ('Walking', Workout.TYPE_WALK),
         ('Cycling', Workout.TYPE_RIDE),
+        ('Mountain Biking', Workout.TYPE_RIDE),
     )
 
     for name, workout_type in runkeeper_types:
