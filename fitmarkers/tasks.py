@@ -3,7 +3,7 @@ import json
 import logging
 import urllib
 
-from celery import task
+from celery import task, chord
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
@@ -91,11 +91,18 @@ def get_new_runkeeper_workouts(social_auth_users, since_date):
 
 @task(name='create_workouts')
 def create_workouts(social_auth_user, raw_workouts, provider):
+    created_workouts = []
     for provider_id, raw_workout in raw_workouts.iteritems():
         workout = Workout(**raw_workout)
         workout.save()
-        check_workout_for_markers.apply_async((workout,))
+        created_workouts.append(workout)
+        #check_workout_for_markers.apply_async((workout,))
         logger.info('Created {0} for {1}'.format(workout, social_auth_user.user))
+    # We want to wait until markers have been checked for each worker before updating
+    # leaderboards, so use chord to wait for all subtasks to complete.
+    header = [check_workout_for_markers.s(workout) for workout in created_workouts]
+    callback = update_leaderboards_for_user.subtask(args=(social_auth_user.user,))
+    chord(header)(callback)
 
 
 @task(name='get_new_mmf_workouts')
@@ -176,7 +183,7 @@ def update_leaderboards_for_user(user):
     for monthly_workout_marker in monthly_workout_markers:
         monthly_points += monthly_workout_marker.marker.point_value
 
-    #print 'Monthly points for {0} is {1}.'.format(user, monthly_points)
+    logger.info('Creating/Updating monthly points for {0}: {1}'.format(user, monthly_points))
     create_or_update_entry(monthly_points, user.id, year=today.year, month=today.month)
 
     """
@@ -191,5 +198,5 @@ def update_leaderboards_for_user(user):
     for all_time_workout_marker in all_time_workout_markers:
         all_time_points += all_time_workout_marker.marker.point_value
 
-    #print 'Monthly points for {0} is {1}.'.format(user, all_time_points)
+    logger.info('Creating/Updating all time points for {0}: {1}'.format(user, all_time_points))
     create_or_update_entry(all_time_points, user.id, all_time=True)
