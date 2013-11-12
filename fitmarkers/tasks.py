@@ -96,12 +96,11 @@ def create_workouts(social_auth_user, raw_workouts, provider):
         workout = Workout(**raw_workout)
         workout.save()
         created_workouts.append(workout)
-        #check_workout_for_markers.apply_async((workout,))
         logger.info('Created {0} for {1}'.format(workout, social_auth_user.user))
     # We want to wait until markers have been checked for each worker before updating
     # leaderboards, so use chord to wait for all subtasks to complete.
     header = [check_workout_for_markers.s(workout) for workout in created_workouts]
-    callback = update_leaderboards_for_user.subtask(args=(social_auth_user.user,))
+    callback = update_leaderboards_for_user.subtask(args=(social_auth_user.user,), immutable=True)
     chord(header)(callback)
 
 
