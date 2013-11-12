@@ -121,7 +121,6 @@ INSTALLED_APPS = (
     'social.apps.django_app.default',
     'fitmarkers',
     'fitmarkers.markers',
-    'kombu.transport.django',
     'djcelery',
     'storages',
     # Uncomment the next line to enable the admin:
@@ -152,9 +151,8 @@ LOGIN_REDIRECT_URL = '/user/dashboard/'
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
-BROKER_BACKEND = 'django'
 CELERY_TIMEZONE = 'UTC'
-BROKER_URL = 'django://'
+BROKER_URL = 'redis://localhost:6379/1'
 
 djcelery.setup_loader()
 
