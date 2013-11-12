@@ -3,3 +3,4 @@ venv
 celerybeat-schedule.db
 logs
 *.pyc
+markers.geojson
