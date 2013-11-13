@@ -5,6 +5,7 @@ from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
+from ..leaderboards import get_user_rank
 from ..markers.models import WorkoutMarker
 from ..models import Workout
 from ..utils import get_first_day_of_month
@@ -20,8 +21,11 @@ def dashboard(request):
     first_day_of_month = get_first_day_of_month()
     monthly_workouts = Workout.objects.filter(user=request.user, start_datetime__gte=first_day_of_month).order_by('-start_datetime').select_related('WorkoutMarker').annotate(workout_marker_count=Count('workoutmarker'))
 
+    monthly_all_types_rank = get_user_rank(request.user.id, all_time=True)
+
     context = {
         'monthly_workouts': monthly_workouts,
+        'monthly_all_types_rank': monthly_all_types_rank,
     }
 
     return render(request, 'user_dashboard.html', context)
