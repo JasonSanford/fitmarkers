@@ -34,5 +34,5 @@ def get_user_rank(user_id, all_time=False, year=None, month=None):
         raise NameError('Either all_time=True or year and month must be passed.')
 
     leaderboard_db = keyval.get_db(keyval.TYPE_LEADERBOARD)
-    rank = leaderboard_db.zrank(leaderboard_key, user_id)
+    rank = leaderboard_db.zrevrank(leaderboard_key, user_id)
     return rank
