@@ -1,10 +1,10 @@
 #!/bin/bash
  
 NAME="fitmarkers_web"                                   # Name of the application
-DJANGODIR=/home/gitspatial/apps/fitmarkers              # Django project directory
-SOCKFILE=/home/gitspatial/fitmarkers/run/gunicorn.sock  # we will communicte using this unix socket
-USER=gitspatial                                         # the user to run as
-GROUP=gitspatial                                        # the group to run as
+DJANGODIR=/home/fitmarkers/apps/fitmarkers              # Django project directory
+SOCKFILE=/home/fitmarkers/fitmarkers/run/gunicorn.sock  # we will communicte using this unix socket
+USER=fitmarkers                                         # the user to run as
+GROUP=fitmarkers                                        # the group to run as
 NUM_WORKERS=3                                           # how many worker processes should Gunicorn spawn
 DJANGO_SETTINGS_MODULE=fitmarkers.settings.production   # which settings file should Django use
 DJANGO_WSGI_MODULE=fitmarkers.wsgi                      # WSGI module name
@@ -14,7 +14,7 @@ echo "Starting $NAME"
 # Activate the virtual environment
 cd $DJANGODIR
 source venv/bin/activate
-source /home/gitspatial/apps/fitmarkers/.env
+source /home/fitmarkers/apps/fitmarkers/.env
 export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
 export PYTHONPATH=$DJANGODIR:$PYTHONPATH
  

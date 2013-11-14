@@ -1,16 +1,16 @@
 #!/bin/bash
  
 NAME="fitmarkers_celery"                                # Name of the application
-DJANGODIR=/home/gitspatial/apps/fitmarkers              # Django project directory
-USER=gitspatial                                         # the user to run as
-GROUP=gitspatial                                        # the group to run as
+DJANGODIR=/home/fitmarkers/apps/fitmarkers              # Django project directory
+USER=fitmarkers                                         # the user to run as
+GROUP=fitmarkers                                        # the group to run as
  
 echo "Starting $NAME"
  
 # Activate the virtual environment
 cd $DJANGODIR
 source venv/bin/activate
-source /home/gitspatial/apps/fitmarkers/.env
+source /home/fitmarkers/apps/fitmarkers/.env
 export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 
 # Start your Celery Unicorn
