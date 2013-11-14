@@ -1,3 +1,4 @@
+import datetime
 import json
 
 from django.contrib.auth.decorators import login_required
@@ -5,7 +6,7 @@ from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
-from ..leaderboards import get_user_rank, get_leaderboard_count
+from ..leaderboards import get_user_rank, get_leaderboard_count, get_user_score
 from ..markers.models import WorkoutMarker
 from ..models import Workout
 from ..utils import get_first_day_of_month
@@ -21,15 +22,28 @@ def dashboard(request):
     first_day_of_month = get_first_day_of_month()
     monthly_workouts = Workout.objects.filter(user=request.user, start_datetime__gte=first_day_of_month).order_by('-start_datetime').select_related('WorkoutMarker').annotate(workout_marker_count=Count('workoutmarker'))
 
-    monthly_all_types_rank = get_user_rank(request.user.id, all_time=True)
+    all_time_all_types_rank = get_user_rank(request.user.id, all_time=True)
+    all_time_all_types_score = get_user_score(request.user.id, all_time=True)
+    if all_time_all_types_rank is not None:
+        all_time_all_types_rank += 1  # 0-based index
+    all_time_all_types_lb_count = get_leaderboard_count(all_time=True)
+
+    now = datetime.datetime.now()
+
+    monthly_all_types_rank = get_user_rank(request.user.id, month=now.month, year=now.year)
+    monthly_all_types_score = get_user_score(request.user.id, month=now.month, year=now.year)
     if monthly_all_types_rank is not None:
         monthly_all_types_rank += 1  # 0-based index
-    monthly_all_types_lb_count = get_leaderboard_count(all_time=True)
+    monthly_all_types_lb_count = get_leaderboard_count(month=now.month, year=now.year)
 
     context = {
         'monthly_workouts': monthly_workouts,
+        'all_time_all_types_rank': all_time_all_types_rank,
+        'all_time_all_types_lb_count': all_time_all_types_lb_count,
+        'all_time_all_types_score': all_time_all_types_score,
         'monthly_all_types_rank': monthly_all_types_rank,
         'monthly_all_types_lb_count': monthly_all_types_lb_count,
+        'monthly_all_types_score': monthly_all_types_score,
     }
 
     return render(request, 'user_dashboard.html', context)

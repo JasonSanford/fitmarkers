@@ -2,11 +2,33 @@
 
 {% block content %}
 
-<h2>My Dasboard</h2>
+<h1>My Dasboard</h1>
+
+<div class="row">
+
+{% if all_time_all_types_rank %}
+<div class="col-md-4" style="padding: 5px;">
+    <div class="well">
+        <h2 style="text-align: center; margin-top: 10px;">All Time</h2>
+        <h3 style="text-align: center; margin-top: 5px;">All Activities</h3>
+        <h3 style="text-align: center;">Ranked {{ all_time_all_types_rank }} of {{ all_time_all_types_lb_count }}</h3>
+        <h4 style="text-align: center;">with {{ all_time_all_types_score }} points</h4>
+    </div>
+</div>
+{% endif %}
 
 {% if monthly_all_types_rank %}
-Rank: {{ monthly_all_types_rank }} of {{ monthly_all_types_lb_count }}
+<div class="col-md-4" style="padding: 5px;">
+    <div class="well">
+        <h2 style="text-align: center; margin-top: 10px;">This Month</h2>
+        <h3 style="text-align: center; margin-top: 5px;">All Activities</h3>
+        <h3 style="text-align: center;">Ranked {{ monthly_all_types_rank }} of {{ monthly_all_types_lb_count }}</h3>
+        <h4 style="text-align: center;">with {{ monthly_all_types_score }} points</h4>
+    </div>
+</div>
 {% endif %}
+
+</div>
 
 <table class="table table-striped">
     <thead>
