@@ -4,7 +4,9 @@
 
 <h2>My Dasboard</h2>
 
-Rank: {{ monthly_all_types_rank }}
+{% if monthly_all_types_rank %}
+Rank: {{ monthly_all_types_rank }} of {{ monthly_all_types_lb_count }}
+{% endif %}
 
 <table class="table table-striped">
     <thead>

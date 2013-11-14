@@ -117,7 +117,7 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
     L.control.layers({'Road': road_layer, 'Satellite': satellite_layer}, null).addTo(map);
     fitmarkers_layer = new lvector.FitMarkers({
         map: map,
-        scaleRange: [13, 18],
+        scaleRange: [12, 18],
         symbology: {
             type: 'single',
             vectorOptions: {

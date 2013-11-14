@@ -4,3 +4,4 @@ celerybeat-schedule.db
 logs
 *.pyc
 markers.geojson
+dump.rdb
