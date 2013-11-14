@@ -1,6 +1,6 @@
 from fabric.api import local, env, run, cd
 
-env.hosts = ['gitspatial@gitspatial.com']
+env.hosts = ['gitspatial@fitmarkers.com']
 run_tests_command = 'python manage.py test fitmarkers'
 
 
