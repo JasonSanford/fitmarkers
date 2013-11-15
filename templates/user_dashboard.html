@@ -32,6 +32,10 @@
 
 </div>
 
+<h2>This Month's Markers</h2>
+
+<div id="map-container" style="height: 500px; border: 1px solid #999999;"></div>
+
 <h2>This Month's Workouts</h2>
 
 <table class="table table-striped">
@@ -66,3 +70,16 @@
 </table>
 
 {% endblock %}
+
+{% block javascript %}
+<script>
+fm.monthly_markers = {{ monthly_markers_geojson|safe }};
+</script>
+<script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+<script src="{{ STATIC_URL }}js/lvector.js"></script>
+<script src="{{ STATIC_URL }}js/dashboard.js"></script>
+{% endblock %}
+
+{% block css %}
+<link href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" rel="stylesheet">
+{% endblock%}

@@ -36,8 +36,26 @@ def dashboard(request):
         monthly_all_types_rank += 1  # 0-based index
     monthly_all_types_lb_count = get_leaderboard_count(month=now.month, year=now.year)
 
+    monthly_workouts_ids = monthly_workouts.values_list('id', flat=True)
+
+    monthly_workouts_markers = WorkoutMarker.objects.filter(workout__id__in=monthly_workouts_ids).distinct('marker')
+    monthly_markers_geojson = {'type': 'FeatureCollection', 'features': []}
+    for wm in monthly_workouts_markers:
+        wm_feature = {
+            'type': 'Feature',
+            'properties': {
+                'name': wm.marker.name,
+                'point_value': wm.marker.point_value,
+                'description': wm.marker.description,
+                'marker_id': wm.marker.id,
+            },
+            'geometry': {'type': 'Point', 'coordinates': [wm.marker.geom.x, wm.marker.geom.y]}
+        }
+        monthly_markers_geojson['features'].append(wm_feature)
+
     context = {
         'monthly_workouts': monthly_workouts,
+        'monthly_markers_geojson': json.dumps(monthly_markers_geojson),
         'all_time_all_types_rank': all_time_all_types_rank,
         'all_time_all_types_lb_count': all_time_all_types_lb_count,
         'all_time_all_types_score': all_time_all_types_score,
