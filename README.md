@@ -1,3 +1,20 @@
+## Leaderboards
+
+Redis Sorted Sets act as leaderboards. The users' point value will servce as the redis score. Set keys look like `activity_all:timespan_all` or `activity_ride:timespan_nov2013`.
+
+Leaderboards needed
+
+Activity / Timespan
+All / All
+Run / All
+Ride / All
+Walk / All
+
+All / Month
+Run / Month
+Ride / Month
+Walk / Month
+
 ## Dependencies
 
 ### System

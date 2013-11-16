@@ -199,7 +199,7 @@ def update_leaderboards_for_user(user):
         monthly_points += monthly_workout_marker.marker.point_value
 
     logger.info('Creating/Updating monthly points for {0}: {1}'.format(user, monthly_points))
-    create_or_update_entry(monthly_points, user.id, year=today.year, month=today.month)
+    create_or_update_entry(monthly_points, user, year=today.year, month=today.month)
 
     """
     All Time
@@ -214,4 +214,4 @@ def update_leaderboards_for_user(user):
         all_time_points += all_time_workout_marker.marker.point_value
 
     logger.info('Creating/Updating all time points for {0}: {1}'.format(user, all_time_points))
-    create_or_update_entry(all_time_points, user.id, all_time=True)
+    create_or_update_entry(all_time_points, user, all_time=True)
