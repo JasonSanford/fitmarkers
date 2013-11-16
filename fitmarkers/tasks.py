@@ -156,6 +156,8 @@ def get_new_mmf_workouts(social_auth_users, since_date):
 
 @task(name='check_workout_for_markers')
 def check_workout_for_markers(workout):
+    # First check to see that all current WMs are deleted
+    WorkoutMarker.objects.filter(workout=workout).delete()
     markers_on_workout = Marker.objects.filter(geom__distance_lte=(workout.geom, D(m=20)))
     for marker_on_workout in markers_on_workout:
         workout_marker = WorkoutMarker(workout=workout, marker=marker_on_workout)

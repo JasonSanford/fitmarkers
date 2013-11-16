@@ -20,11 +20,12 @@ class Marker(behaviors.Timestampable, geo_models.Model):
 
 
 class WorkoutMarker(models.Model):
-    class Meta:
-        app_label = 'fitmarkers'
-
     workout = models.ForeignKey(Workout)
     marker = models.ForeignKey(Marker)
+
+    class Meta:
+        app_label = 'fitmarkers'
+        unique_together = ('workout', 'marker',)
 
     def __str__(self):
         return '<WorkoutMarker {0}>'.format(self.id)
