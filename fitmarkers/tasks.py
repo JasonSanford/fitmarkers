@@ -113,40 +113,54 @@ def get_new_mmf_workouts(social_auth_users, since_date):
             'created_after': '{0}-{1}-{2}T00:00:00+00:00'.format(since_date.year, since_date.month, since_date.day)
         }
         encoded_params = urllib.urlencode(url_params)
-        workouts_response = mmf_api.get('/v7.0/workout/?{0}'.format(encoded_params)).json()
-        raw_workouts = workouts_response['_embedded']['workouts']
+
         existing_workout_count = 0
         no_time_series_workout_count = 0
         workouts_to_create = {}
-        for raw_workout in raw_workouts:
-            workout_id = raw_workout['_links']['self'][0]['id']
-            #
-            # We could use get_or_create here, but there's no sense going through
-            # process of parsing the workout geometry if we don't have to.
-            #
-            try:
-                existing_workout = Workout.objects.get(provider_id=workout_id, provider=Providers.MAPMYFITNESS)
-                existing_workout_count += 1
-                continue
-            except Workout.DoesNotExist:
-                pass
-            if raw_workout['has_time_series']:
-                workout_route = mmf_api.get('{0}?field_set=detailed'.format(raw_workout['_links']['route'][0]['href'])).json()
+        url = '/v7.0/workout/?{0}'.format(encoded_params)
+        there_are_more_workouts = True
+
+        while there_are_more_workouts:
+
+            workouts_response = mmf_api.get(url).json()
+
+            raw_workouts = workouts_response['_embedded']['workouts']
+            there_are_more_workouts = '_links' in workouts_response and 'next' in workouts_response['_links'] and workouts_response['_links']['next']
+
+            if there_are_more_workouts:
+                url = workouts_response['_links']['next'][0]['href']
+
+            for raw_workout in raw_workouts:
+
+                workout_id = raw_workout['_links']['self'][0]['id']
+                #
+                # We could use get_or_create here, but there's no sense going through
+                # process of parsing the workout geometry if we don't have to.
+                #
                 try:
-                    workouts_to_create[workout_id] = {
-                        'user': sau.user,
-                        'provider': Providers.MAPMYFITNESS,
-                        'provider_id': workout_id,
-                        'type': mmf_utils.type_dict_to_int(raw_workout['_links']['activity_type'][0], mmf_api),
-                        'start_datetime': mmf_utils.date_string_to_datetime(raw_workout['start_datetime']),
-                        'duration': int(raw_workout['aggregates']['active_time_total']),
-                        'geom': GEOSGeometry(json.dumps(mmf_utils.points_to_geojson(workout_route['points']))),
-                    }
-                except InvalidWorkoutTypeException as exc:
-                    logger.error('Invalid workout type for User: {0}, Provider Id: {1}. - {2}'.format(sau.user, Providers.MAPMYFITNESS, str(exc)))
+                    existing_workout = Workout.objects.get(provider_id=workout_id, provider=Providers.MAPMYFITNESS)
+                    existing_workout_count += 1
                     continue
-            else:
-                no_time_series_workout_count += 1
+                except Workout.DoesNotExist:
+                    pass
+                if raw_workout['has_time_series']:
+                    workout_route = mmf_api.get('{0}?field_set=detailed'.format(raw_workout['_links']['route'][0]['href'])).json()
+                    try:
+                        workouts_to_create[workout_id] = {
+                            'user': sau.user,
+                            'provider': Providers.MAPMYFITNESS,
+                            'provider_id': workout_id,
+                            'type': mmf_utils.type_dict_to_int(raw_workout['_links']['activity_type'][0], mmf_api),
+                            'start_datetime': mmf_utils.date_string_to_datetime(raw_workout['start_datetime']),
+                            'duration': int(raw_workout['aggregates']['active_time_total']),
+                            'geom': GEOSGeometry(json.dumps(mmf_utils.points_to_geojson(workout_route['points']))),
+                        }
+                    except InvalidWorkoutTypeException as exc:
+                        logger.error('Invalid workout type for User: {0}, Provider Id: {1}. - {2}'.format(sau.user, Providers.MAPMYFITNESS, str(exc)))
+                        continue
+                else:
+                    no_time_series_workout_count += 1
+
         logger.info('Creating {0} workouts for {1}.'.format(len(workouts_to_create), sau.user))
         logger.info('Ignoring {0} workouts for {1} because they already exist.'.format(existing_workout_count, sau.user))
         logger.info('Ignoring {0} workouts for {1} because there is no time series.'.format(no_time_series_workout_count, sau.user))
