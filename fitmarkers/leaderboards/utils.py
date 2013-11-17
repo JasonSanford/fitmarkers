@@ -6,15 +6,15 @@ from fitmarkers import keyval
 logger = logging.getLogger(__name__)
 
 
-def create_or_update_entry(points, user, all_time=False, year=None, month=None):
+def create_or_update_entry(points, user, activity_type, all_time=False, year=None, month=None):
     """
     Create or Update a leaderboard entry in Redis
     """
     if all_time:
-        leaderboard_key = 'type_all:timespan_all'
+        leaderboard_key = 'type_{0}:timespan_all'.format(activity_type)
     elif year and month:
         month_string = str(month).zfill(2)
-        leaderboard_key = 'type_all:timespan_{0}{1}'.format(year, month_string)
+        leaderboard_key = 'type_{0}:timespan_{1}{2}'.format(activity_type, year, month_string)
     else:
         raise NameError('Either all_time=True or year and month must be passed.')
 
