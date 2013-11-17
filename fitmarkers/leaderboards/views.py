@@ -1,4 +1,5 @@
 import ast
+import datetime
 import logging
 
 from django.http import HttpResponse
@@ -12,7 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 def leaderboards_landing(request):
-    return render(request, 'leaderboards_landing.html', {})
+    now = datetime.datetime.now()
+    context = {'current_year': str(now.year), 'current_month': str(now.month).zfill(2)}
+    return render(request, 'leaderboards_landing.html', context)
 
 
 def get_leaderboard(request):
@@ -23,6 +26,7 @@ def get_leaderboard(request):
     timespan = request.GET.get('timespan')
 
     leaderboard_key = 'type_{0}:timespan_{1}'.format(activity, timespan)
+    logger.debug('leaderboard_key: %s' % leaderboard_key)
 
     leaderboard_meta_key = '{0}:meta'.format(leaderboard_key)
     leaderboard_db = keyval.get_db(keyval.TYPE_LEADERBOARD)
