@@ -10,7 +10,7 @@ from django.contrib.gis.measure import D
 from social.apps.django_app.default.models import UserSocialAuth
 
 from exceptions import InvalidWorkoutTypeException
-from leaderboards import create_or_update_entry
+from leaderboards.utils import create_or_update_entry
 from models import Workout
 from markers.models import Marker, WorkoutMarker
 from remote import Providers

@@ -1,6 +1,6 @@
 import logging
 
-import keyval
+from fitmarkers import keyval
 
 
 logger = logging.getLogger(__name__)

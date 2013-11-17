@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Leaderboards</h2>
+
+<label for="select-activity">Activity Type</label>
+
+<ul id="select-activity" class="nav nav-pills selector">
+    <li data-type="all" class="active"><a class="select activity" href="#">All</a></li>
+    <li data-type="run"><a class="select activity" href="#">Run</a></li>
+    <li data-type="ride"><a class="select activity" href="#">Ride</a></li>
+    <li data-type="walk"><a class="select activity" href="#">Walk</a></li>
+</ul>
+
+<label for="select-timespan">Timespan</label>
+
+<ul id="select-timespan" class="nav nav-pills selector">
+    <li data-type="all" class="active"><a class="select timespan" href="#">All Time</a></li>
+    <li data-type="month"><a class="select timespan" href="#">This Month</a></li>
+</ul>
+
+<div id="leaderboard-container"></div>
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ STATIC_URL }}js/leaderboards.js"></script>
+{% endblock %}

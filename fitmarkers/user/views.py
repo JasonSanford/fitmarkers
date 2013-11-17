@@ -6,7 +6,7 @@ from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
-from ..leaderboards import get_user_rank, get_leaderboard_count, get_user_score
+from ..leaderboards.utils import get_user_rank, get_leaderboard_count, get_user_score
 from ..markers.models import WorkoutMarker
 from ..models import Workout
 from ..utils import get_first_day_of_month
