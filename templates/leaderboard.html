@@ -7,7 +7,7 @@
     </thead>
     <tbody>
         {% for entry in entries %}
-        <tr>
+        <tr{% if entry.is_authd_user %} class="warning"{% endif %}>
             <td>{{ entry.name }}</td>
             <td>{{ entry.points }}</td>
         </tr>

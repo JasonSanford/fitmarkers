@@ -26,7 +26,6 @@ def get_leaderboard(request):
     timespan = request.GET.get('timespan')
 
     leaderboard_key = 'type_{0}:timespan_{1}'.format(activity, timespan)
-    logger.debug('leaderboard_key: %s' % leaderboard_key)
 
     leaderboard_meta_key = '{0}:meta'.format(leaderboard_key)
     leaderboard_db = keyval.get_db(keyval.TYPE_LEADERBOARD)
@@ -38,8 +37,10 @@ def get_leaderboard(request):
     leaderboard_count = leaderboard_db.zcard(leaderboard_key)
 
     context = {'entries': [], 'total_count': leaderboard_count}
-    for entry in entries:
-        context['entries'].append(ast.literal_eval(entry))
+    for stringy_dict_entry in entries:
+        entry = ast.literal_eval(stringy_dict_entry)
+        entry['is_authd_user'] = entry['user_id'] == request.user.id
+        context['entries'].append(entry)
 
     response = render_to_string('leaderboard.html', context)
 
