@@ -8,24 +8,94 @@
 
 <div class="row">
 
-{% if all_time_all_types_rank %}
-<div class="col-md-4" style="padding: 5px;">
+{% if all_time_leaderboards.all.rank %}
+<div class="col-md-3" style="padding: 5px;">
     <div class="well">
         <h2 style="text-align: center; margin-top: 10px;">All Time</h2>
         <h3 style="text-align: center; margin-top: 5px;">All Activities</h3>
-        <h3 style="text-align: center;">Ranked {{ all_time_all_types_rank }} of {{ all_time_all_types_lb_count }}</h3>
-        <h4 style="text-align: center;">with {{ all_time_all_types_score }} points</h4>
+        <h3 style="text-align: center;">Ranked {{ all_time_leaderboards.all.rank }} of {{ all_time_leaderboards.all.count }}</h3>
+        <h4 style="text-align: center;">with {{ all_time_leaderboards.all.score }} points</h4>
     </div>
 </div>
 {% endif %}
 
-{% if monthly_all_types_rank %}
-<div class="col-md-4" style="padding: 5px;">
+{% if all_time_leaderboards.run.rank %}
+<div class="col-md-3" style="padding: 5px;">
+    <div class="well">
+        <h2 style="text-align: center; margin-top: 10px;">All Time</h2>
+        <h3 style="text-align: center; margin-top: 5px;">Running</h3>
+        <h3 style="text-align: center;">Ranked {{ all_time_leaderboards.run.rank }} of {{ all_time_leaderboards.run.count }}</h3>
+        <h4 style="text-align: center;">with {{ all_time_leaderboards.run.score }} points</h4>
+    </div>
+</div>
+{% endif %}
+
+{% if all_time_leaderboards.ride.rank %}
+<div class="col-md-3" style="padding: 5px;">
+    <div class="well">
+        <h2 style="text-align: center; margin-top: 10px;">All Time</h2>
+        <h3 style="text-align: center; margin-top: 5px;">Biking</h3>
+        <h3 style="text-align: center;">Ranked {{ all_time_leaderboards.ride.rank }} of {{ all_time_leaderboards.ride.count }}</h3>
+        <h4 style="text-align: center;">with {{ all_time_leaderboards.ride.score }} points</h4>
+    </div>
+</div>
+{% endif %}
+
+{% if all_time_leaderboards.walk.rank %}
+<div class="col-md-3" style="padding: 5px;">
+    <div class="well">
+        <h2 style="text-align: center; margin-top: 10px;">All Time</h2>
+        <h3 style="text-align: center; margin-top: 5px;">Walking</h3>
+        <h3 style="text-align: center;">Ranked {{ all_time_leaderboards.walk.rank }} of {{ all_time_leaderboards.walk.count }}</h3>
+        <h4 style="text-align: center;">with {{ all_time_leaderboards.walk.score }} points</h4>
+    </div>
+</div>
+{% endif %}
+
+</div>
+
+<div class="row">
+
+{% if monthly_leaderboards.all.rank %}
+<div class="col-md-3" style="padding: 5px;">
     <div class="well">
         <h2 style="text-align: center; margin-top: 10px;">This Month</h2>
         <h3 style="text-align: center; margin-top: 5px;">All Activities</h3>
-        <h3 style="text-align: center;">Ranked {{ monthly_all_types_rank }} of {{ monthly_all_types_lb_count }}</h3>
-        <h4 style="text-align: center;">with {{ monthly_all_types_score }} points</h4>
+        <h3 style="text-align: center;">Ranked {{ monthly_leaderboards.all.rank }} of {{ monthly_leaderboards.all.count }}</h3>
+        <h4 style="text-align: center;">with {{ monthly_leaderboards.all.score }} points</h4>
+    </div>
+</div>
+{% endif %}
+
+{% if monthly_leaderboards.run.rank %}
+<div class="col-md-3" style="padding: 5px;">
+    <div class="well">
+        <h2 style="text-align: center; margin-top: 10px;">This Month</h2>
+        <h3 style="text-align: center; margin-top: 5px;">Running</h3>
+        <h3 style="text-align: center;">Ranked {{ monthly_leaderboards.run.rank }} of {{ monthly_leaderboards.run.count }}</h3>
+        <h4 style="text-align: center;">with {{ monthly_leaderboards.run.score }} points</h4>
+    </div>
+</div>
+{% endif %}
+
+{% if monthly_leaderboards.ride.rank %}
+<div class="col-md-3" style="padding: 5px;">
+    <div class="well">
+        <h2 style="text-align: center; margin-top: 10px;">This Month</h2>
+        <h3 style="text-align: center; margin-top: 5px;">Biking</h3>
+        <h3 style="text-align: center;">Ranked {{ monthly_leaderboards.ride.rank }} of {{ monthly_leaderboards.ride.count }}</h3>
+        <h4 style="text-align: center;">with {{ monthly_leaderboards.ride.score }} points</h4>
+    </div>
+</div>
+{% endif %}
+
+{% if monthly_leaderboards.walk.rank %}
+<div class="col-md-3" style="padding: 5px;">
+    <div class="well">
+        <h2 style="text-align: center; margin-top: 10px;">This Month</h2>
+        <h3 style="text-align: center; margin-top: 5px;">Walking</h3>
+        <h3 style="text-align: center;">Ranked {{ monthly_leaderboards.walk.rank }} of {{ monthly_leaderboards.walk.count }}</h3>
+        <h4 style="text-align: center;">with {{ monthly_leaderboards.walk.score }} points</h4>
     </div>
 </div>
 {% endif %}

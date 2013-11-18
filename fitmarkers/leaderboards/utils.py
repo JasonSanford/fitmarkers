@@ -6,10 +6,7 @@ from fitmarkers import keyval
 logger = logging.getLogger(__name__)
 
 
-def create_or_update_entry(points, user, activity_type, all_time=False, year=None, month=None):
-    """
-    Create or Update a leaderboard entry in Redis
-    """
+def build_leaderboard_key(activity_type, all_time, year, month):
     if all_time:
         leaderboard_key = 'type_{0}:timespan_all'.format(activity_type)
     elif year and month:
@@ -17,6 +14,15 @@ def create_or_update_entry(points, user, activity_type, all_time=False, year=Non
         leaderboard_key = 'type_{0}:timespan_{1}{2}'.format(activity_type, year, month_string)
     else:
         raise NameError('Either all_time=True or year and month must be passed.')
+
+    return leaderboard_key
+
+
+def create_or_update_entry(points, user, activity_type, all_time=False, year=None, month=None):
+    """
+    Create or Update a leaderboard entry in Redis
+    """
+    leaderboard_key = build_leaderboard_key(activity_type, all_time, year, month)
 
     leaderboard_meta_key = '{0}:meta'.format(leaderboard_key)
     leaderboard_db = keyval.get_db(keyval.TYPE_LEADERBOARD)
@@ -32,34 +38,22 @@ def create_or_update_entry(points, user, activity_type, all_time=False, year=Non
     leaderboard_db.zadd(leaderboard_key, points, user.id)
 
 
-def get_user_rank(user_id, all_time=False, year=None, month=None):
+def get_user_rank(user_id, activity_type, all_time=False, year=None, month=None):
     """
     Get a user's rank on a leaderboard
     """
-    if all_time:
-        leaderboard_key = 'type_all:timespan_all'
-    elif year and month:
-        month_string = str(month).zfill(2)
-        leaderboard_key = 'type_all:timespan_{0}{1}'.format(year, month_string)
-    else:
-        raise NameError('Either all_time=True or year and month must be passed.')
+    leaderboard_key = build_leaderboard_key(activity_type, all_time, year, month)
 
     leaderboard_db = keyval.get_db(keyval.TYPE_LEADERBOARD)
     rank = leaderboard_db.zrevrank(leaderboard_key, user_id)
     return rank
 
 
-def get_user_score(user_id, all_time=False, year=None, month=None):
+def get_user_score(user_id, activity_type, all_time=False, year=None, month=None):
     """
     Get a user's score on a leaderboard
     """
-    if all_time:
-        leaderboard_key = 'type_all:timespan_all'
-    elif year and month:
-        month_string = str(month).zfill(2)
-        leaderboard_key = 'type_all:timespan_{0}{1}'.format(year, month_string)
-    else:
-        raise NameError('Either all_time=True or year and month must be passed.')
+    leaderboard_key = build_leaderboard_key(activity_type, all_time, year, month)
 
     leaderboard_db = keyval.get_db(keyval.TYPE_LEADERBOARD)
     score = leaderboard_db.zscore(leaderboard_key, user_id)
@@ -68,17 +62,11 @@ def get_user_score(user_id, all_time=False, year=None, month=None):
     return score
 
 
-def get_leaderboard_count(all_time=False, year=None, month=None):
+def get_leaderboard_count(activity_type, all_time=False, year=None, month=None):
     """
     Get the number of users on a leaderboard
     """
-    if all_time:
-        leaderboard_key = 'type_all:timespan_all'
-    elif year and month:
-        month_string = str(month).zfill(2)
-        leaderboard_key = 'type_all:timespan_{0}{1}'.format(year, month_string)
-    else:
-        raise NameError('Either all_time=True or year and month must be passed.')
+    leaderboard_key = build_leaderboard_key(activity_type, all_time, year, month)
 
     leaderboard_db = keyval.get_db(keyval.TYPE_LEADERBOARD)
     count = leaderboard_db.zcard(leaderboard_key)

@@ -22,19 +22,7 @@ def dashboard(request):
     first_day_of_month = get_first_day_of_month()
     monthly_workouts = Workout.objects.filter(user=request.user, start_datetime__gte=first_day_of_month).order_by('-start_datetime').select_related('WorkoutMarker').annotate(workout_marker_count=Count('workoutmarker'))
 
-    all_time_all_types_rank = get_user_rank(request.user.id, all_time=True)
-    all_time_all_types_score = get_user_score(request.user.id, all_time=True)
-    if all_time_all_types_rank is not None:
-        all_time_all_types_rank += 1  # 0-based index
-    all_time_all_types_lb_count = get_leaderboard_count(all_time=True)
-
-    now = datetime.datetime.now()
-
-    monthly_all_types_rank = get_user_rank(request.user.id, month=now.month, year=now.year)
-    monthly_all_types_score = get_user_score(request.user.id, month=now.month, year=now.year)
-    if monthly_all_types_rank is not None:
-        monthly_all_types_rank += 1  # 0-based index
-    monthly_all_types_lb_count = get_leaderboard_count(month=now.month, year=now.year)
+    activity_types = ('all', 'run', 'ride', 'walk',)
 
     monthly_workouts_ids = monthly_workouts.values_list('id', flat=True)
 
@@ -56,13 +44,37 @@ def dashboard(request):
     context = {
         'monthly_workouts': monthly_workouts,
         'monthly_markers_geojson': json.dumps(monthly_markers_geojson),
-        'all_time_all_types_rank': all_time_all_types_rank,
-        'all_time_all_types_lb_count': all_time_all_types_lb_count,
-        'all_time_all_types_score': all_time_all_types_score,
-        'monthly_all_types_rank': monthly_all_types_rank,
-        'monthly_all_types_lb_count': monthly_all_types_lb_count,
-        'monthly_all_types_score': monthly_all_types_score,
+        'activity_types': activity_types,
+        'all_time_leaderboards': {},
+        'monthly_leaderboards': {},
     }
+
+    now = datetime.datetime.now()
+
+    for activity_type in activity_types:
+        all_time_rank = get_user_rank(request.user.id, activity_type, all_time=True)
+        all_time_score = get_user_score(request.user.id, activity_type, all_time=True)
+        if all_time_rank is not None:
+            all_time_rank += 1  # 0-based index
+        all_time_count = get_leaderboard_count(activity_type, all_time=True)
+
+        context['all_time_leaderboards'][activity_type] = {
+            'rank': all_time_rank,
+            'score': all_time_score,
+            'count': all_time_count,
+        }
+
+        monthly_rank = get_user_rank(request.user.id, activity_type, month=now.month, year=now.year)
+        monthly_score = get_user_score(request.user.id, activity_type, month=now.month, year=now.year)
+        if monthly_rank is not None:
+            monthly_rank += 1  # 0-based index
+        monthly_count = get_leaderboard_count(activity_type, month=now.month, year=now.year)
+
+        context['monthly_leaderboards'][activity_type] = {
+            'rank': monthly_rank,
+            'score': monthly_score,
+            'count': monthly_count,
+        }
 
     return render(request, 'user_dashboard.html', context)
 
