@@ -7,6 +7,7 @@ boto==2.15.0
 celery==3.0.24
 dj-database-url==0.2.2
 django-celery==3.0.23
+django-redis==3.3
 django-storages==1.1.8
 kombu==2.5.16
 oauthlib==0.6.0

@@ -1,9 +1,14 @@
 import datetime
+import logging
 
+from django.core.cache import cache
 from django.utils.timezone import utc
 
 from fitmarkers.models import Workout
 from fitmarkers.exceptions import InvalidWorkoutTypeException
+
+
+logger = logging.getLogger(__name__)
 
 
 def points_to_geojson(points):
@@ -39,14 +44,22 @@ def type_dict_to_int(type_dict, mmf_api):
     # get the root activity type name and return corresponding
     # Workout.TYPE_CHOICES choice
     #
-    # TODO: Get some memcache up in here, what a waste to do all this HTTP.
     input_id = type_dict['id']
-    activity_type_response = mmf_api.get(type_dict['href']).json()
-    if activity_type_response['_links']['root'][0]['id'] == input_id:
-        mmf_name = activity_type_response['name']
+    cache_key = 'mmf_activity:{0}'.format(input_id)
+
+    cached = cache.get(cache_key)
+    if cached:
+        mmf_name = cached
+        logger.debug('MMF activity type cache hit for {0}'.format(input_id))
     else:
-        root_activity_type_response = mmf_api.get(activity_type_response['_links']['root'][0]['href']).json()
-        mmf_name = root_activity_type_response['name']
+        logger.debug('MMF activity type cache miss for {0}'.format(input_id))
+        activity_type_response = mmf_api.get(type_dict['href']).json()
+        if activity_type_response['_links']['root'][0]['id'] == input_id:
+            mmf_name = activity_type_response['name']
+        else:
+            root_activity_type_response = mmf_api.get(activity_type_response['_links']['root'][0]['href']).json()
+            mmf_name = root_activity_type_response['name']
+        cache.set(cache_key, mmf_name, 60*60*24)  # Cache for 24 hours
 
     mmf_types = (
         ('Run / Jog', Workout.TYPE_RUN),
