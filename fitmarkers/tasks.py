@@ -143,7 +143,7 @@ def get_new_mmf_workouts(social_auth_users, since_date):
                     continue
                 except Workout.DoesNotExist:
                     pass
-                if raw_workout['has_time_series']:
+                if raw_workout['has_time_series'] and 'route' in raw_workout['_links']:
                     workout_route = mmf_api.get('{0}?field_set=detailed'.format(raw_workout['_links']['route'][0]['href'])).json()
                     try:
                         workouts_to_create[workout_id] = {
