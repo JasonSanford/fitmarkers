@@ -22,6 +22,7 @@ def dashboard(request):
     first_day_of_month = get_first_day_of_month()
     monthly_workouts = Workout.objects.filter(user=request.user, start_datetime__gte=first_day_of_month).order_by('-start_datetime').select_related('WorkoutMarker').annotate(workout_marker_count=Count('workoutmarker'))
 
+    timespans = ('all_time', 'monthly',)
     activity_types = ('all', 'run', 'ride', 'walk',)
 
     monthly_workouts_ids = monthly_workouts.values_list('id', flat=True)
@@ -51,30 +52,26 @@ def dashboard(request):
 
     now = datetime.datetime.now()
 
-    for activity_type in activity_types:
-        all_time_rank = get_user_rank(request.user.id, activity_type, all_time=True)
-        all_time_score = get_user_score(request.user.id, activity_type, all_time=True)
-        if all_time_rank is not None:
-            all_time_rank += 1  # 0-based index
-        all_time_count = get_leaderboard_count(activity_type, all_time=True)
+    for timespan in timespans:
+        for activity_type in activity_types:
+            kwargs = {'activity_type': activity_type}
+            if timespan == 'all_time':
+                kwargs['all_time'] = True
+            else:
+                kwargs['month'] = now.month
+                kwargs['year'] = now.year
 
-        context['all_time_leaderboards'][activity_type] = {
-            'rank': all_time_rank,
-            'score': all_time_score,
-            'count': all_time_count,
-        }
+            rank = get_user_rank(request.user.id, **kwargs)
+            score = get_user_score(request.user.id, **kwargs)
+            if rank is not None:
+                rank += 1  # 0-based index
+            count = get_leaderboard_count(**kwargs)
 
-        monthly_rank = get_user_rank(request.user.id, activity_type, month=now.month, year=now.year)
-        monthly_score = get_user_score(request.user.id, activity_type, month=now.month, year=now.year)
-        if monthly_rank is not None:
-            monthly_rank += 1  # 0-based index
-        monthly_count = get_leaderboard_count(activity_type, month=now.month, year=now.year)
-
-        context['monthly_leaderboards'][activity_type] = {
-            'rank': monthly_rank,
-            'score': monthly_score,
-            'count': monthly_count,
-        }
+            context['{0}_leaderboards'.format(timespan)][activity_type] = {
+                'rank': rank,
+                'score': score,
+                'count': count,
+            }
 
     return render(request, 'user_dashboard.html', context)
 
