@@ -161,7 +161,7 @@ CELERY_IMPORTS = ('fitmarkers.tasks',)
 CELERYBEAT_SCHEDULE = {
     'get_new_workouts_for_all_users': {
         'task': 'get_new_workouts_for_all_users',
-        'schedule': timedelta(minutes=5),
+        'schedule': timedelta(minutes=10),
     },
 }
 
