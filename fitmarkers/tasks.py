@@ -191,85 +191,33 @@ def update_leaderboards_for_user(user):
 
     monthly_workouts = Workout.objects.filter(user=user, start_datetime__gte=first_of_month)
 
-    # All types
-    monthly_workouts_ids = monthly_workouts.values_list('id', flat=True)
-    monthly_workout_markers = WorkoutMarker.objects.filter(workout__id__in=monthly_workouts_ids).distinct('marker')
-    monthly_points = 0
-    for monthly_workout_marker in monthly_workout_markers:
-        monthly_points += monthly_workout_marker.marker.point_value
-    logger.info('Creating/Updating monthly all points for {0}: {1}'.format(user, monthly_points))
-    create_or_update_entry(monthly_points, user, 'all', year=today.year, month=today.month)
+    timespans = ('all', 'monthly',)
+    activity_types = {
+        'all': None,
+        'run': Workout.TYPE_RUN,
+        'ride': Workout.TYPE_RIDE,
+        'walk': Workout.TYPE_WALK,
+    }
 
-    # Run
-    monthly_run_workouts = monthly_workouts.filter(type=Workout.TYPE_RUN)
-    monthly_run_workouts_ids = monthly_run_workouts.values_list('id', flat=True)
-    monthly_run_workout_markers = WorkoutMarker.objects.filter(workout__id__in=monthly_run_workouts_ids).distinct('marker')
-    monthly_run_points = 0
-    for monthly_run_workout_marker in monthly_run_workout_markers:
-        monthly_run_points += monthly_run_workout_marker.marker.point_value
-    logger.info('Creating/Updating monthly run points for {0}: {1}'.format(user, monthly_run_points))
-    create_or_update_entry(monthly_run_points, user, 'run', year=today.year, month=today.month)
-
-    # Ride
-    monthly_ride_workouts = monthly_workouts.filter(type=Workout.TYPE_RIDE)
-    monthly_ride_workouts_ids = monthly_ride_workouts.values_list('id', flat=True)
-    monthly_ride_workout_markers = WorkoutMarker.objects.filter(workout__id__in=monthly_ride_workouts_ids).distinct('marker')
-    monthly_ride_points = 0
-    for monthly_ride_workout_marker in monthly_ride_workout_markers:
-        monthly_ride_points += monthly_ride_workout_marker.marker.point_value
-    logger.info('Creating/Updating monthly ride points for {0}: {1}'.format(user, monthly_ride_points))
-    create_or_update_entry(monthly_ride_points, user, 'ride', year=today.year, month=today.month)
-
-    # Walk
-    monthly_walk_workouts = monthly_workouts.filter(type=Workout.TYPE_WALK)
-    monthly_walk_workouts_ids = monthly_walk_workouts.values_list('id', flat=True)
-    monthly_walk_workout_markers = WorkoutMarker.objects.filter(workout__id__in=monthly_walk_workouts_ids).distinct('marker')
-    monthly_walk_points = 0
-    for monthly_walk_workout_marker in monthly_walk_workout_markers:
-        monthly_walk_points += monthly_walk_workout_marker.marker.point_value
-    logger.info('Creating/Updating monthly walk points for {0}: {1}'.format(user, monthly_walk_points))
-    create_or_update_entry(monthly_walk_points, user, 'walk', year=today.year, month=today.month)
-
-    """
-    All Time
-    """
     all_time_workouts = Workout.objects.filter(user=user)
+    monthly_workouts = all_time_workouts.filter(user=user, start_datetime__gte=first_of_month)
 
-    # All types
-    all_time_workouts_ids = all_time_workouts.values_list('id', flat=True)
-    all_time_workout_markers = WorkoutMarker.objects.filter(workout__id__in=all_time_workouts_ids).distinct('marker')
-    all_time_points = 0
-    for all_time_workout_marker in all_time_workout_markers:
-        all_time_points += all_time_workout_marker.marker.point_value
-    logger.info('Creating/Updating all time all points for {0}: {1}'.format(user, all_time_points))
-    create_or_update_entry(all_time_points, user, 'all', all_time=True)
-
-    # Run
-    all_time_run_workouts = all_time_workouts.filter(type=Workout.TYPE_RUN)
-    all_time_run_workouts_ids = all_time_run_workouts.values_list('id', flat=True)
-    all_time_run_workout_markers = WorkoutMarker.objects.filter(workout__id__in=all_time_run_workouts_ids).distinct('marker')
-    all_time_run_points = 0
-    for all_time_run_workout_marker in all_time_run_workout_markers:
-        all_time_run_points += all_time_run_workout_marker.marker.point_value
-    logger.info('Creating/Updating all time run points for {0}: {1}'.format(user, all_time_run_points))
-    create_or_update_entry(all_time_run_points, user, 'run', all_time=True)
-
-    # Ride
-    all_time_ride_workouts = all_time_workouts.filter(type=Workout.TYPE_RIDE)
-    all_time_ride_workouts_ids = all_time_ride_workouts.values_list('id', flat=True)
-    all_time_ride_workout_markers = WorkoutMarker.objects.filter(workout__id__in=all_time_ride_workouts_ids).distinct('marker')
-    all_time_ride_points = 0
-    for all_time_ride_workout_marker in all_time_ride_workout_markers:
-        all_time_ride_points += all_time_ride_workout_marker.marker.point_value
-    logger.info('Creating/Updating all time ride points for {0}: {1}'.format(user, all_time_ride_points))
-    create_or_update_entry(all_time_ride_points, user, 'ride', all_time=True)
-
-    # Walk
-    all_time_walk_workouts = all_time_workouts.filter(type=Workout.TYPE_WALK)
-    all_time_walk_workouts_ids = all_time_walk_workouts.values_list('id', flat=True)
-    all_time_walk_workout_markers = WorkoutMarker.objects.filter(workout__id__in=all_time_walk_workouts_ids).distinct('marker')
-    all_time_walk_points = 0
-    for all_time_walk_workout_marker in all_time_walk_workout_markers:
-        all_time_walk_points += all_time_walk_workout_marker.marker.point_value
-    logger.info('Creating/Updating all time walk points for {0}: {1}'.format(user, all_time_walk_points))
-    create_or_update_entry(all_time_walk_points, user, 'walk', all_time=True)
+    for timespan in timespans:
+        if timespan == 'all':
+            workouts = all_time_workouts
+            kwargs = {'all_time': True}
+        else:
+            workouts = monthly_workouts
+            kwargs = {'year': today.year, 'month': today.month}
+        for activity_type, activity_enum in activity_types.iteritems():
+            if activity_type != 'all':
+                these_workouts = workouts.filter(type=activity_enum)
+            else:
+                these_workouts = workouts
+            workouts_ids = these_workouts.values_list('id', flat=True)
+            workout_markers = WorkoutMarker.objects.filter(workout__id__in=workouts_ids).distinct('marker')
+            points = 0
+            for workout_marker in workout_markers:
+                points += workout_marker.marker.point_value
+            logger.info('Creating/Updating {0} {1} points for {2}: {3}'.format(timespan, activity_type, user, points))
+            create_or_update_entry(points, user, activity_type, **kwargs)
