@@ -12,5 +12,6 @@ def get_last_monday():
 
 def get_first_day_of_month():
     today = datetime.date.today()
-    first_of_month = datetime.datetime(today.year, today.month, 1, tzinfo=utc)
+    # TODO - revert this back to beginning of this month. This was set to 2 months to do some backfill.
+    first_of_month = datetime.datetime(today.year, today.month-2, 1, tzinfo=utc)
     return first_of_month
