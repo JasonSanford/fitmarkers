@@ -6,6 +6,7 @@ import urllib
 from celery import task, chord
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.measure import D
 from social.apps.django_app.default.models import UserSocialAuth
 
@@ -157,6 +158,9 @@ def get_new_mmf_workouts(social_auth_users, since_date):
                         }
                     except InvalidWorkoutTypeException as exc:
                         logger.error('Invalid workout type for User: {0}, Provider Id: {1}. - {2}'.format(sau.user, Providers.MAPMYFITNESS, str(exc)))
+                        continue
+                    except GEOSException as exc:
+                        logger.error('GEOSException processing User: {0}, Raw workout: {1}.'.format(sau.user, raw_workout))
                         continue
                 else:
                     no_time_series_workout_count += 1
