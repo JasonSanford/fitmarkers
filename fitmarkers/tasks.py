@@ -183,8 +183,8 @@ def get_new_mmf_workouts(social_auth_users, since_date):
 def check_workout_for_markers(workout):
     # First check to see that all current WMs are deleted
     WorkoutMarker.objects.filter(workout=workout).delete()
+    # The commented ORM query below was way slower, so doing getting raw here.
     #markers_on_workout = Marker.objects.filter(geom__distance_lte=(workout.geom, D(m=20)))
-    # select * from fitmarkers_marker where st_intersects(geom, (select st_buffer(geom, 0.00013) as geom from fitmarkers_workout where id=175))
     raw_sql = 'select * from fitmarkers_marker where st_intersects(geom, (select st_buffer(geom, {0}) as geom from fitmarkers_workout where id={1}))'.format(constants.WORKOUT_BUFFER, workout.id)
     markers_on_workout = Marker.objects.raw(raw_sql)
     for marker_on_workout in markers_on_workout:
