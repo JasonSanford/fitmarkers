@@ -13,6 +13,7 @@ from social.apps.django_app.default.models import UserSocialAuth
 from exceptions import InvalidWorkoutTypeException
 from leaderboards.utils import create_or_update_entry
 from models import Workout
+from fitmarkers import constants
 from markers.models import Marker, WorkoutMarker
 from remote import Providers
 from remote.oauth.runkeeper import RunKeeperAPI
@@ -182,13 +183,16 @@ def get_new_mmf_workouts(social_auth_users, since_date):
 def check_workout_for_markers(workout):
     # First check to see that all current WMs are deleted
     WorkoutMarker.objects.filter(workout=workout).delete()
-    markers_on_workout = Marker.objects.filter(geom__distance_lte=(workout.geom, D(m=20)))
+    #markers_on_workout = Marker.objects.filter(geom__distance_lte=(workout.geom, D(m=20)))
+    # select * from fitmarkers_marker where st_intersects(geom, (select st_buffer(geom, 0.00013) as geom from fitmarkers_workout where id=175))
+    raw_sql = 'select * from fitmarkers_marker where st_intersects(geom, (select st_buffer(geom, {0}) as geom from fitmarkers_workout where id={1}))'.format(constants.WORKOUT_BUFFER, workout.id)
+    markers_on_workout = Marker.objects.raw(raw_sql)
     for marker_on_workout in markers_on_workout:
         workout_marker = WorkoutMarker(workout=workout, marker=marker_on_workout)
         workout_marker.save()
     workout.processed = True
     workout.save()
-    logger.info('Created {0} WorkoutMarkers for {1}'.format(len(markers_on_workout), workout))
+    logger.info('Created {0} WorkoutMarkers for {1}'.format(len(list(markers_on_workout)), workout))
 
 
 @task(name='update_leaderboards_for_user')
