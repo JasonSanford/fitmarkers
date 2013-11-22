@@ -146,6 +146,9 @@ def get_new_mmf_workouts(social_auth_users, since_date):
                     pass
                 if raw_workout['has_time_series'] and 'route' in raw_workout['_links']:
                     workout_route = mmf_api.get('{0}?field_set=detailed'.format(raw_workout['_links']['route'][0]['href'])).json()
+                    if len(workout_route['points']) < 2:
+                        logger.info('Workout route for user: {0} only has one point: {1}'.format(sau.user, workout_route))
+                        continue
                     try:
                         workouts_to_create[workout_id] = {
                             'user': sau.user,
