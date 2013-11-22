@@ -33,8 +33,11 @@ def get_new_workouts_for_all_users():
 
 
 @task(name='get_new_workouts_for_user')
-def get_new_workouts_for_user(user):
-    since_datetime = get_first_day_of_month()
+def get_new_workouts_for_user(user, since=None):
+    if since is not None:
+        since_datetime = since
+    else:
+        since_datetime = get_first_day_of_month()
     social_auth_users = UserSocialAuth.objects.filter(user=user)
     
     runkeeper_users = [sau for sau in social_auth_users if sau.provider == 'runkeeper']
@@ -111,7 +114,7 @@ def get_new_mmf_workouts(social_auth_users, since_date):
         mmf_api = MapMyFitnessAPI(social_auth_user=sau)
         url_params = {
             'user': sau.uid,
-            'created_after': '{0}-{1}-{2}T00:00:00+00:00'.format(since_date.year, since_date.month, since_date.day)
+            'started_after': '{0}-{1}-{2}T00:00:00+00:00'.format(since_date.year, since_date.month, since_date.day)
         }
         encoded_params = urllib.urlencode(url_params)
 
