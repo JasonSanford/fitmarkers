@@ -26,3 +26,13 @@ Walk / Month
 ### Python
 
 See `requirements.txt` - `pip install -r requirements.txt`
+
+## Importing Markers
+
+For now marker creation is manual. Markers are maintained in https://github.com/JasonSanford/markers and edited in http://geojson.io.
+
+To add new markers, first `truncate cascaded` the `fitmarkers_marker` table. Then:
+
+    curl -O https://raw.github.com/JasonSanford/markers/master/markers.geojson
+    python manage.py geojson_to_markers markers.geojson
+
