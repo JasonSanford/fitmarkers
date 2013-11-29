@@ -3,7 +3,7 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from ..leaderboards.utils import get_user_rank, get_leaderboard_count, get_user_score
@@ -19,33 +19,10 @@ def user(request):
 
 @login_required
 def dashboard(request):
-    first_day_of_month = get_first_day_of_month()
-    monthly_workouts = Workout.objects.filter(user=request.user, start_datetime__gte=first_day_of_month).order_by('-start_datetime').select_related('WorkoutMarker').annotate(workout_marker_count=Count('workoutmarker'))
-
     timespans = ('all_time', 'monthly',)
     activity_types = ('all', 'run', 'ride', 'walk',)
 
-    monthly_workouts_ids = monthly_workouts.values_list('id', flat=True)
-
-    monthly_workouts_markers = WorkoutMarker.objects.filter(workout__id__in=monthly_workouts_ids).distinct('marker')
-    monthly_markers_geojson = {'type': 'FeatureCollection', 'features': []}
-    for wm in monthly_workouts_markers:
-        wm_feature = {
-            'type': 'Feature',
-            'properties': {
-                'name': wm.marker.name,
-                'point_value': wm.marker.point_value,
-                'description': wm.marker.description,
-                'marker_id': wm.marker.id,
-            },
-            'geometry': {'type': 'Point', 'coordinates': [wm.marker.geom.x, wm.marker.geom.y]}
-        }
-        monthly_markers_geojson['features'].append(wm_feature)
-
     context = {
-        'monthly_workouts': monthly_workouts,
-        'monthly_markers_geojson': json.dumps(monthly_markers_geojson),
-        'activity_types': activity_types,
         'all_time_leaderboards': {},
         'monthly_leaderboards': {},
     }
@@ -74,6 +51,52 @@ def dashboard(request):
             }
 
     return render(request, 'user_dashboard.html', context)
+
+
+@login_required
+def monthly_workouts(request):
+    activity_type = request.GET.get('activity_type')
+    first_day_of_month = get_first_day_of_month()
+    filter_kwargs = {
+        'user': request.user,
+        'start_datetime__gte': first_day_of_month,
+    }
+    if activity_type:
+        attr = 'type_{0}'.format(activity_type)
+        filter_kwargs['type'] = getattr(Workout, attr.upper())
+    monthly_workouts = Workout.objects.filter(**filter_kwargs).order_by('-start_datetime').select_related('WorkoutMarker').annotate(workout_marker_count=Count('workoutmarker'))
+    monthly_workouts_ids = monthly_workouts.values_list('id', flat=True)
+    monthly_workouts_markers = WorkoutMarker.objects.filter(workout__id__in=monthly_workouts_ids).distinct('marker')
+
+    monthly_markers_geojson = {'type': 'FeatureCollection', 'features': []}
+    for wm in monthly_workouts_markers:
+        wm_feature = {
+            'type': 'Feature',
+            'properties': {
+                'name': wm.marker.name,
+                'point_value': wm.marker.point_value,
+                'description': wm.marker.description,
+                'marker_id': wm.marker.id,
+            },
+            'geometry': {'type': 'Point', 'coordinates': [wm.marker.geom.x, wm.marker.geom.y]}
+        }
+        monthly_markers_geojson['features'].append(wm_feature)
+
+    workouts = [
+        {
+            'id': w.id,
+            'date': w.start_datetime.strftime('%b %d, %Y'),
+            'type': w.get_type_display(),
+            'marker_count': w.workout_marker_count,
+        } for w in monthly_workouts
+    ]
+
+    content = {
+        'workouts': workouts,
+        'markers_geojson': monthly_markers_geojson,
+    }
+
+    return HttpResponse(json.dumps(content), content_type='application/json')
 
 
 @login_required

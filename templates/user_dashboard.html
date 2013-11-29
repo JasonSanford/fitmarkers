@@ -98,49 +98,56 @@
 
 </div>
 
-<h2>This Month's Markers</h2>
+<h2>This Month's Workouts &amp; FitMarkers</h2>
 
-<div id="map-container" style="height: 500px; border: 1px solid #999999;"></div>
+<div class="row">
+    <label for="select-activity">Activity Type</label>
 
-<h2>This Month's Workouts</h2>
+    <ul id="select-activity" class="nav nav-pills selector">
+        <li data-type="all" class="active"><a class="select activity" href="#">All</a></li>
+        <li data-type="run"><a class="select activity" href="#">Run</a></li>
+        <li data-type="ride"><a class="select activity" href="#">Ride</a></li>
+        <li data-type="walk"><a class="select activity" href="#">Walk</a></li>
+    </ul>
+</div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>From</th>
-            <th>FitMarkers</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for workout in monthly_workouts %}
-        <tr>
-            <td>
-                <a href="{% url 'user_workout' workout.id %}">
-                    {{ workout.start_datetime|date:"M d, Y" }}
-                </a>
-            </td>
-            <td>
-                {{ workout.get_type_display }}
-            </td>
-            <td>
-                {{ workout.get_provider_display }}
-            </td>
-            <td>
-                {{ workout.workout_marker_count }}
-            </td>
-        {% endfor %}
-        </tr>
-    </tbody>
-</table>
+<div class="row" style="height: 500px;">
+    <div class="col-md-4 full-height">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>FitMarkers</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for workout in monthly_workouts %}
+                <tr>
+                    <td>
+                        <a href="{% url 'user_workout' workout.id %}">
+                            {{ workout.start_datetime|date:"M d, Y" }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ workout.get_type_display }}
+                    </td>
+                    <td>
+                        {{ workout.workout_marker_count }}
+                    </td>
+                {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-8 full-height">
+        <div id="map-container" class="map-container full-height"></div>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block javascript %}
-<script>
-fm.monthly_markers = {{ monthly_markers_geojson|safe }};
-</script>
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script src="{{ STATIC_URL }}js/lvector.js"></script>
 <script src="{{ STATIC_URL }}js/dashboard.js"></script>

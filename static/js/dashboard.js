@@ -58,12 +58,6 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
 });
 
 (function() {
-    var excludeIds = [];
-    for (var _wm in fm.monthly_markers.features) {
-        wm = fm.monthly_markers.features[_wm];
-        excludeIds.push(wm.properties.marker_id);
-    }
-    fm.excludeIds = excludeIds;
     var mediumIconLight = L.icon({
         iconUrl: 'http://api.tiles.mapbox.com/v3/marker/pin-m+94b7cb.png',
         iconSize: [30, 70],
@@ -94,20 +88,22 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
             }),
         map = new L.Map('map-container', {
             center: [40, -100],
-            zoom: 18,
+            zoom: 10,
             layers: [
                 road_layer
             ]
         }),
-        monthly_markers_layer = new L.GeoJSON(fm.monthly_markers, {
+        monthly_markers_layer = new L.GeoJSON(null, {
             pointToLayer: function (feature, latLng) {
                 return L.marker(latLng, {icon: mediumIconDarkStar});
             }
-        });
-    map
-        .addLayer(monthly_markers_layer)
-        .fitBounds(monthly_markers_layer.getBounds());
+        }),
+        first_run = true;
+    
+    map.addLayer(monthly_markers_layer);
+    
     L.control.layers({'Road': road_layer, 'Satellite': satellite_layer}, null).addTo(map);
+    
     fitmarkers_layer = new lvector.FitMarkers({
         map: map,
         scaleRange: [12, 18],
@@ -118,4 +114,52 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
             }
         }
     });
+
+    function getMonthlyMarkers() {
+        fitmarkers_layer._hide();
+        monthly_markers_layer.clearLayers();
+        var activity_type = $('#select-activity').find('li.active').data('type'),
+            url = '/user/monthly_workouts/';
+        if (activity_type !== 'all') {
+            url += '?activity_type=' + activity_type;
+        }
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var excludeIds = [];
+                for (var _wm in data.markers_geojson.features) {
+                    wm = data.markers_geojson.features[_wm];
+                    excludeIds.push(wm.properties.marker_id);
+                }
+                fm.excludeIds = excludeIds;
+                monthly_markers_layer.addData(data.markers_geojson);
+                if (first_run) {
+                    map.fitBounds(monthly_markers_layer.getBounds());
+                    first_run = false;
+                }
+                fitmarkers_layer._show();
+            },
+            error: function () {
+
+            }
+        });
+    }
+
+    $(document).on('ready', function () {
+        $('.selector').find('a.select').on('click', function (event) {
+            event.preventDefault();
+            var $this = $(this),
+                $parent = $this.parent();
+            if ($parent.hasClass('active')) {
+                return;
+            } else {
+                $this.parent().addClass('active').siblings().removeClass('active');
+                getMonthlyMarkers();
+            }
+        });
+    });
+
+    getMonthlyMarkers();
 }());
