@@ -2,6 +2,7 @@ import datetime
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse
 from django.db.models import Count
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -88,6 +89,7 @@ def monthly_workouts(request):
             'date': w.start_datetime.strftime('%b %d, %Y'),
             'type': w.get_type_display(),
             'marker_count': w.workout_marker_count,
+            'url': reverse('user_workout', args=[w.id])
         } for w in monthly_workouts
     ]
 

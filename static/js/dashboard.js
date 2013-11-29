@@ -58,6 +58,8 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
 });
 
 (function() {
+    var workouts_template_source   = $("#workouts-template").html(),
+        workouts_template = Handlebars.compile(workouts_template_source);
     var mediumIconLight = L.icon({
         iconUrl: 'http://api.tiles.mapbox.com/v3/marker/pin-m+94b7cb.png',
         iconSize: [30, 70],
@@ -99,11 +101,11 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
             }
         }),
         first_run = true;
-    
+
     map.addLayer(monthly_markers_layer);
-    
+
     L.control.layers({'Road': road_layer, 'Satellite': satellite_layer}, null).addTo(map);
-    
+
     fitmarkers_layer = new lvector.FitMarkers({
         map: map,
         scaleRange: [12, 18],
@@ -118,11 +120,14 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
     function getMonthlyMarkers() {
         fitmarkers_layer._hide();
         monthly_markers_layer.clearLayers();
+
         var activity_type = $('#select-activity').find('li.active').data('type'),
             url = '/user/monthly_workouts/';
+
         if (activity_type !== 'all') {
             url += '?activity_type=' + activity_type;
         }
+
         $.ajax({
             url: url,
             type: 'GET',
@@ -140,12 +145,22 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
                     first_run = false;
                 }
                 fitmarkers_layer._show();
+                $('#workout-table-container').html(workouts_template(data));
             },
             error: function () {
 
             }
         });
     }
+
+    Handlebars.registerHelper('link', function(text, url) {
+        text = Handlebars.Utils.escapeExpression(text);
+        url  = Handlebars.Utils.escapeExpression(url);
+
+        var result = '<a href="' + url + '">' + text + '</a>';
+
+        return new Handlebars.SafeString(result);
+    });
 
     $(document).on('ready', function () {
         $('.selector').find('a.select').on('click', function (event) {

@@ -112,33 +112,39 @@
 </div>
 
 <div class="row" style="height: 500px;">
-    <div class="col-md-4 full-height">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>FitMarkers</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for workout in monthly_workouts %}
-                <tr>
-                    <td>
-                        <a href="{% url 'user_workout' workout.id %}">
-                            {{ workout.start_datetime|date:"M d, Y" }}
-                        </a>
-                    </td>
-                    <td>
-                        {{ workout.get_type_display }}
-                    </td>
-                    <td>
-                        {{ workout.workout_marker_count }}
-                    </td>
-                {% endfor %}
-                </tr>
-            </tbody>
-        </table>
+    <div id="workout-table-container" class="col-md-4 full-height" style="overflow-y: auto;">
+        <script id="workouts-template" type="text/x-handlebars-template">
+            {% verbatim %}
+            {{#if workouts}}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>FitMarkers</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each workouts}}
+                    <tr>
+                        <td>
+                            {{link this.date this.url}}
+                        </td>
+                        <td>
+                            {{this.type}}
+                        </td>
+                        <td>
+                            {{this.marker_count}}
+                        </td>
+                    {{/each}}
+                    </tr>
+                </tbody>
+            </table>
+            {{else}}
+            No workouts found :(
+            {{/if}}
+            {% endverbatim %}
+        </script>
     </div>
     <div class="col-md-8 full-height">
         <div id="map-container" class="map-container full-height"></div>
@@ -150,6 +156,7 @@
 {% block javascript %}
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script src="{{ STATIC_URL }}js/lvector.js"></script>
+<script src="{{ STATIC_URL }}js/handlebars.js"></script>
 <script src="{{ STATIC_URL }}js/dashboard.js"></script>
 {% endblock %}
 
