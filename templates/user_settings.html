@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Account Settings</h2>
+
+<form id="user-settings-form" class="form-horizontal" role="form" action="{% url 'user_settings' %}" method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="timezone" class="col-sm-2 control-label">Timezone</label>
+        <div class="col-sm-10">
+            <select id="timezone" name="timezone" class="form-control">
+                {% for timezone in all_timezones %}
+                <option value="{{ timezone }}"{% if timezone == user_timezone %} selected{% endif %}>{{ timezone }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div id="settings-update-success" class="alert alert-success" style="display: none;"><strong>Success!!</strong> Your settings have been saved.</div>
+    <div id="settings-update-error" class="alert alert-error" style="display: none;"><strong>Error :(</strong> <span class="message">There was a problem saving your settings.</span></div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default">Save</button>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ STATIC_URL }}js/settings.js"></script>
+{% endblock %}

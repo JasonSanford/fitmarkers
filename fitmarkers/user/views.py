@@ -4,9 +4,12 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Count
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_http_methods
+from pytz import common_timezones
 
+from .forms import UserProfileForm
 from ..leaderboards.utils import get_user_rank, get_leaderboard_count, get_user_score
 from ..markers.models import WorkoutMarker
 from ..models import Workout
@@ -16,6 +19,31 @@ from ..utils import get_first_day_of_month
 @login_required
 def user(request):
     return redirect('fitmarkers.user.views.dashboard')
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def settings(request):
+    user_profile = request.user.profile
+    if request.method == 'GET':
+        user_timezone = user_profile.timezone
+        all_timezones = common_timezones
+        context = {
+            'user_timezone': user_timezone,
+            'all_timezones': all_timezones,
+        }
+        return render(request, 'user_settings.html', context)
+    else:  # POST
+        form = UserProfileForm(request.POST, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            return HttpResponse(json.dumps({'status': 'success'}), content_type='application/json')
+        else:
+            message = ''
+            for field, errors in form.errors.items():
+                for error in errors:
+                    message += 'Field %s: %s' % (field, error)
+            return HttpResponseBadRequest(json.dumps({'status': 'error', 'message': message}), content_type='application/json')
 
 
 @login_required
