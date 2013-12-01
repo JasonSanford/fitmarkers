@@ -30,6 +30,8 @@ def dashboard(request):
 
     now = datetime.datetime.now()
 
+    profile = request.user.profile
+
     for timespan in timespans:
         for activity_type in activity_types:
             kwargs = {'activity_type': activity_type}
@@ -49,6 +51,7 @@ def dashboard(request):
                 'rank': rank,
                 'score': score,
                 'count': count,
+                'profile': profile,
             }
 
     return render(request, 'user_dashboard.html', context)
