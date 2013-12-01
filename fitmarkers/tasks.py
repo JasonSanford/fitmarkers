@@ -7,7 +7,6 @@ from celery import task, chord
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.measure import D
 from social.apps.django_app.default.models import UserSocialAuth
 
 from exceptions import InvalidWorkoutTypeException
