@@ -37,7 +37,7 @@ def get_new_workouts_for_user(user, since=None):
     if since is not None:
         since_datetime = since
     else:
-        since_datetime = get_first_day_of_month()
+        since_datetime = get_first_day_of_month(user)
     social_auth_users = UserSocialAuth.objects.filter(user=user)
     
     runkeeper_users = [sau for sau in social_auth_users if sau.provider == 'runkeeper']
@@ -200,7 +200,7 @@ def update_leaderboards_for_user(user):
     Monthly
     """
     today = datetime.date.today()
-    first_of_month = get_first_day_of_month()
+    first_of_month = get_first_day_of_month(user)
 
     monthly_workouts = Workout.objects.filter(user=user, start_datetime__gte=first_of_month)
 

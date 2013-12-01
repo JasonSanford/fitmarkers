@@ -88,7 +88,7 @@ def dashboard(request):
 @login_required
 def monthly_workouts(request):
     activity_type = request.GET.get('activity_type')
-    first_day_of_month = get_first_day_of_month()
+    first_day_of_month = get_first_day_of_month(request.user)
     filter_kwargs = {
         'user': request.user,
         'start_datetime__gte': first_day_of_month,
