@@ -38,7 +38,7 @@ class Workout(behaviors.Timestampable, geo_models.Model):
 
     @property
     def is_this_week(self):
-        return self.start_datetime > get_last_monday()
+        return self.start_datetime > get_last_monday(self.user)
 
     @property
     def display_date(self):
