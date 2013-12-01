@@ -140,7 +140,7 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
                 }
                 fm.excludeIds = excludeIds;
                 monthly_markers_layer.addData(data.markers_geojson);
-                if (first_run) {
+                if (first_run && data.markers_geojson.features.length) {
                     map.fitBounds(monthly_markers_layer.getBounds());
                     first_run = false;
                 }
