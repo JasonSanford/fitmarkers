@@ -15,9 +15,7 @@ from models import Workout
 from fitmarkers import constants
 from markers.models import Marker, WorkoutMarker
 from remote import Providers
-from remote.oauth.runkeeper import RunKeeperAPI
 from remote.oauth.mapmyfitness import MapMyFitnessAPI
-from remote.runkeeper import utils as rk_utils
 from remote.mapmyfitness import utils as mmf_utils
 from utils import get_first_day_of_month
 
@@ -40,61 +38,16 @@ def get_new_workouts_for_user(user, since=None):
         since_datetime = get_first_day_of_month(user)
     social_auth_users = UserSocialAuth.objects.filter(user=user)
     
-    runkeeper_users = [sau for sau in social_auth_users if sau.provider == 'runkeeper']
+    # This task was stubbed out like this to allow for fetching
+    # workouts from multiple providers. See old runkeeper below
+    # runkeeper_users = [sau for sau in social_auth_users if sau.provider == 'runkeeper']
     mmf_users = [sau for sau in social_auth_users if sau.provider == 'mapmyfitness']
 
-    get_new_runkeeper_workouts.delay(runkeeper_users, since_datetime)
     get_new_mmf_workouts.delay(mmf_users, since_datetime)
 
 
-@task(name='get_new_runkeeper_workouts')
-def get_new_runkeeper_workouts(social_auth_users, since_date):
-    for sau in social_auth_users:
-        rk_api = RunKeeperAPI(social_auth_user=sau)
-        activities_response = rk_api.get('/fitnessActivities?noEarlierThan={0}-{1}-{2}'.format(since_date.year, since_date.month, since_date.day))
-        raw_workouts = activities_response.json()['items']
-        existing_workout_count = 0
-        no_path_workout_count = 0
-        workouts_to_create = {}
-        for raw_workout in raw_workouts:
-            uri_parts = raw_workout['uri'].split('fitnessActivities/')
-            workout_id = int(uri_parts[1])
-            #
-            # We could use get_or_create here, but there's no sense going through
-            # process of parsing the workout geometry if we don't have to.
-            #
-            try:
-                existing_workout = Workout.objects.get(provider_id=workout_id, provider=Providers.RUNKEEPER)
-                existing_workout_count += 1
-                continue
-            except Workout.DoesNotExist:
-                pass
-            if raw_workout['has_path']:
-                raw_workout_full = rk_api.get(raw_workout['uri']).json()
-                try:
-                    workouts_to_create[workout_id] = {
-                        'user': sau.user,
-                        'provider': Providers.RUNKEEPER,
-                        'provider_id': workout_id,
-                        'type': rk_utils.type_string_to_int(raw_workout['type']),
-                        'start_datetime': rk_utils.date_string_to_datetime(raw_workout['start_time']),
-                        'duration': int(raw_workout['duration']),
-                        'geom': GEOSGeometry(json.dumps(rk_utils.path_to_geojson(raw_workout_full['path']))),
-                    }
-                except InvalidWorkoutTypeException as exc:
-                    logger.error('Invalid workout type for User: {0}, Provider Id: {1}. - {2}'.format(sau.user, Providers.RUNKEEPER, str(exc)))
-                    continue
-            else:
-                no_path_workout_count += 1
-        logger.info('Creating {0} workouts for {1}.'.format(len(workouts_to_create), sau.user))
-        logger.info('Ignoring {0} workouts for {1} because they already exist.'.format(existing_workout_count, sau.user))
-        logger.info('Ignoring {0} workouts for {1} because there is no path.'.format(no_path_workout_count, sau.user))
-        if workouts_to_create:
-            create_workouts.delay(sau, workouts_to_create, Providers.RUNKEEPER)
-
-
 @task(name='create_workouts')
-def create_workouts(social_auth_user, raw_workouts, provider):
+def create_workouts(social_auth_user, raw_workouts):
     created_workouts = []
     for provider_id, raw_workout in raw_workouts.iteritems():
         workout = Workout(**raw_workout)
@@ -175,7 +128,7 @@ def get_new_mmf_workouts(social_auth_users, since_date):
         logger.info('Ignoring {0} workouts for {1} because they already exist.'.format(existing_workout_count, sau.user))
         logger.info('Ignoring {0} workouts for {1} because there is no time series.'.format(no_time_series_workout_count, sau.user))
         if workouts_to_create:
-            create_workouts.delay(sau, workouts_to_create, Providers.RUNKEEPER)
+            create_workouts.delay(sau, workouts_to_create)
 
 
 @task(name='check_workout_for_markers')
