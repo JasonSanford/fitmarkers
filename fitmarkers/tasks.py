@@ -10,7 +10,7 @@ from django.contrib.gis.geos.error import GEOSException
 from social.apps.django_app.default.models import UserSocialAuth
 
 from exceptions import InvalidWorkoutTypeException
-from leaderboards.utils import create_or_update_entry
+from leaderboards.utils import create_or_update_entry, get_leaderboard_leader
 from models import Workout
 from fitmarkers import constants
 from markers.models import Marker, WorkoutMarker
@@ -187,3 +187,14 @@ def update_leaderboards_for_user(user):
                 points += workout_marker.marker.point_value
             logger.info('Creating/Updating {0} {1} points for {2}: {3}'.format(timespan, activity_type, user, points))
             create_or_update_entry(points, user, activity_type, **kwargs)
+
+
+def award_monthly_achievements(year, month):
+    """
+    Find the user in the top spot of each activity
+    type's leaderboard (and the "all" leaderboard)
+    and create achievements
+    """
+    for activity_type in ('all', 'run', 'ride', 'walk',):
+        leader_user_id = get_leaderboard_leader()
+

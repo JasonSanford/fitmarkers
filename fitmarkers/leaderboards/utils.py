@@ -71,3 +71,14 @@ def get_leaderboard_count(activity_type, all_time=False, year=None, month=None):
     leaderboard_db = keyval.get_db(keyval.TYPE_LEADERBOARD)
     count = leaderboard_db.zcard(leaderboard_key)
     return count
+
+
+def get_leaderboard_leader(activity_type, all_time=False, year=None, month=None):
+    """
+    Return the user id in the top spot of a leaderboard
+    """
+    leaderboard_key = build_leaderboard_key(activity_type, all_time, year, month)
+
+    leaderboard_db = keyval.get_db(keyval.TYPE_LEADERBOARD)
+    user_id = leaderboard_db.zrevrange(leaderboard_key, 0, 0)[0]
+    return int(user_id)
