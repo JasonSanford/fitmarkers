@@ -4,9 +4,11 @@ import logging
 import urllib
 
 from celery import task, chord
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos.error import GEOSException
+from pytz import timezone
 from social.apps.django_app.default.models import UserSocialAuth
 
 from exceptions import InvalidWorkoutTypeException
@@ -148,15 +150,10 @@ def check_workout_for_markers(workout):
 
 
 @task(name='update_leaderboards_for_user')
-def update_leaderboards_for_user(user):
+def update_leaderboards_for_user(user, year=None, month=None):
     """
     Monthly
     """
-    today = datetime.date.today()
-    first_of_month = get_first_day_of_month(user)
-
-    monthly_workouts = Workout.objects.filter(user=user, start_datetime__gte=first_of_month)
-
     timespans = ('all', 'monthly',)
     activity_types = {
         'all': None,
@@ -166,7 +163,15 @@ def update_leaderboards_for_user(user):
     }
 
     all_time_workouts = Workout.objects.filter(user=user)
-    monthly_workouts = all_time_workouts.filter(user=user, start_datetime__gte=first_of_month)
+    if year is None and month is None:
+        leaderboard_start_datetime = get_first_day_of_month(user)
+    else:
+        str_user_timezone = user.profile.timezone
+        user_timezone = timezone(str_user_timezone)
+        leaderboard_start_datetime = datetime.datetime(year, month, 1, tzinfo=user_timezone)
+    leaderboard_end_datetime = leaderboard_start_datetime + relativedelta(months=1)
+
+    monthly_workouts = all_time_workouts.filter(user=user, start_datetime__gte=leaderboard_start_datetime, start_datetime__lt=leaderboard_end_datetime)
 
     for timespan in timespans:
         if timespan == 'all':
@@ -174,7 +179,7 @@ def update_leaderboards_for_user(user):
             kwargs = {'all_time': True}
         else:
             workouts = monthly_workouts
-            kwargs = {'year': today.year, 'month': today.month}
+            kwargs = {'year': leaderboard_start_datetime.year, 'month': leaderboard_start_datetime.month}
         for activity_type, activity_enum in activity_types.iteritems():
             if activity_type != 'all':
                 these_workouts = workouts.filter(type=activity_enum)
