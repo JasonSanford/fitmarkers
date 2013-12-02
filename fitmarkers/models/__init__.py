@@ -28,7 +28,7 @@ class Achievement(Timestampable):
     activity_type = models.IntegerField()
 
     class Meta:
-        unique_together = ('month', 'activity_type')
+        unique_together = ('month_start', 'activity_type')
 
 
 __all__ = (Workout, UserProfile, Achievement,)

@@ -11,9 +11,9 @@ from social.apps.django_app.default.models import UserSocialAuth
 
 from exceptions import InvalidWorkoutTypeException
 from leaderboards.utils import create_or_update_entry, get_leaderboard_leader
-from models import Workout
+from models import Workout, Achievement
 from fitmarkers import constants
-from markers.models import Marker, WorkoutMarker, Achievement
+from markers.models import Marker, WorkoutMarker
 from remote import Providers
 from remote.oauth.mapmyfitness import MapMyFitnessAPI
 from remote.mapmyfitness import utils as mmf_utils
@@ -207,5 +207,5 @@ def award_monthly_achievements(year, month):
     for activity_type, activity_enum in activity_types.iteritems():
         leader_user_id = get_leaderboard_leader(activity_type, year=year, month=month)
         user = User.objects.get(id=leader_user_id)
-        achievement = Achievement(user=user, month=month_start, activity_type=activity_enum)
+        achievement = Achievement(user=user, month_start=month_start, activity_type=activity_enum)
         achievement.save()
