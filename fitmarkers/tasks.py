@@ -190,7 +190,11 @@ def update_leaderboards_for_user(user, year=None, month=None):
             points = 0
             for workout_marker in workout_markers:
                 points += workout_marker.marker.point_value
-            logger.info('Creating/Updating {0} {1} points for {2}: {3}'.format(timespan, activity_type, user, points))
+            if timespan == 'all':
+                timespan_string = 'all'
+            else:
+                timespan_string = 'monthly ({0}-{1})'.format(leaderboard_start_datetime.year, leaderboard_start_datetime.month)
+            logger.info('Creating/Updating {0} {1} points for {2}: {3}'.format(timespan_string, activity_type, user, points))
             create_or_update_entry(points, user, activity_type, **kwargs)
 
 
