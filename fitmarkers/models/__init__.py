@@ -24,7 +24,7 @@ class Achievement(Timestampable):
     TYPE_ALL = 99
 
     user = models.ForeignKey(User)
-    month = models.DateField()  # The first day of the month for award
+    month_start = models.DateField()  # The first day of the month for award
     activity_type = models.IntegerField()
 
     class Meta:

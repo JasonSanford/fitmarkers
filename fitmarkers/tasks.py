@@ -195,18 +195,17 @@ def award_monthly_achievements(year, month):
     type's leaderboard (and the "all" leaderboard)
     and create achievements
     """
-    # First, let's kill the current achievement holders
-    Achievement.objects.filter(month=month).delete()
-
     activity_types = {
         'all': Achievement.TYPE_ALL,
         'run': Achievement.TYPE_RUN,
         'ride': Achievement.TYPE_RIDE,
         'walk': Achievement.TYPE_WALK,
     }
-    month = datetime.datetime(year, month, 1)
+    month_start = datetime.datetime(year, month, 1)
+    # First, let's kill the current achievement holders
+    Achievement.objects.filter(month_start=month_start).delete()
     for activity_type, activity_enum in activity_types.iteritems():
         leader_user_id = get_leaderboard_leader(activity_type, year=year, month=month)
         user = User.objects.get(id=leader_user_id)
-        achievement = Achievement(user=user, month=month, activity_type=activity_enum)
+        achievement = Achievement(user=user, month=month_start, activity_type=activity_enum)
         achievement.save()
