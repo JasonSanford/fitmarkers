@@ -25,7 +25,16 @@ Walk / Month
 
 ### Python
 
+#### Runtime
+
 See `requirements.txt` - `pip install -r requirements.txt`
+
+#### Testing
+
+Some additional libraries are used for tests. For now:
+
+    factory_boy
+    coverage
 
 ## Importing Markers
 
@@ -36,3 +45,13 @@ To add new markers, first `truncate cascaded` the `fitmarkers_marker` table. The
     curl -O https://raw.github.com/JasonSanford/markers/master/markers.geojson
     python manage.py geojson_to_markers markers.geojson
 
+## Testing
+
+See testing dependencies above for required libraries. To run tests:
+
+    python manage.py test fitmarkers
+
+To get a coverage report:
+
+    coverage run manage.py test fitmarkers
+    coverage report -m

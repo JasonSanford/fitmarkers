@@ -5,3 +5,4 @@ logs
 *.pyc
 markers.geojson
 dump.rdb
+.coverage
