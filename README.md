@@ -33,7 +33,6 @@ See `requirements.txt` - `pip install -r requirements.txt`
 
 Some additional libraries are used for tests. For now:
 
-    factory_boy
     coverage
 
 ## Importing Markers
@@ -51,7 +50,7 @@ See testing dependencies above for required libraries. To run tests:
 
     python manage.py test fitmarkers
 
-To get a coverage report:
+To get a coverage report, `pip install coverage` then:
 
     coverage run manage.py test fitmarkers
     coverage report -m
