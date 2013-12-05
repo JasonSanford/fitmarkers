@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from workout import Workout
-from behaviors import Timestampable
+from fitmarkers.models.workouts import Workout
+from fitmarkers.models.behaviors import Timestampable
 
 
 class UserProfile(models.Model):

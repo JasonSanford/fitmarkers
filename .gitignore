@@ -6,3 +6,4 @@ logs
 markers.geojson
 dump.rdb
 .coverage
+htmlcov

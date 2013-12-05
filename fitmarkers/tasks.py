@@ -146,7 +146,9 @@ def check_workout_for_markers(workout):
         workout_marker.save()
     workout.processed = True
     workout.save()
-    logger.info('Created {0} WorkoutMarkers for {1}'.format(len(list(markers_on_workout)), workout))
+    marker_count = len(list(markers_on_workout))
+    logger.info('Created {0} WorkoutMarkers for {1}'.format(marker_count, workout))
+    return marker_count
 
 
 @task(name='update_leaderboards_for_user')
