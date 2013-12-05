@@ -1,15 +1,17 @@
 import json
+import logging
 
 from django.contrib.gis.geos import GEOSGeometry
 from django.test import TestCase
 
-from fitmarkers.markers.models import Marker
 from fitmarkers.markers.tests.factories import MarkerFactory
-from fitmarkers.models import Workout
 from fitmarkers.tasks import check_workout_for_markers
 from fitmarkers.tests.factories import WorkoutFactory
 from fitmarkers.tests.test_data import workout_geom, marker_geoms
 from fitmarkers.user.tests.factories import UserFactory
+
+tasks_logger = logging.getLogger('fitmarkers.tasks')
+tasks_logger.setLevel(logging.ERROR)
 
 
 class WorkoutTest(TestCase):
