@@ -7,6 +7,8 @@ from django.shortcuts import render
 from django.template.loader import render_to_string
 
 from fitmarkers import keyval
+from fitmarkers.leaderboards import START_DATE as leaderboards_start_date
+from fitmarkers.utils import add_months
 
 
 logger = logging.getLogger(__name__)
@@ -14,7 +16,19 @@ logger = logging.getLogger(__name__)
 
 def leaderboards_landing(request):
     now = datetime.datetime.now()
-    context = {'current_year': str(now.year), 'current_month': str(now.month).zfill(2)}
+
+    leaderboard_month_date = leaderboards_start_date
+    current_month_date = datetime.date(now.year, now.month, 1)
+    past_leaderboard_months = []
+    while leaderboard_month_date < current_month_date:
+        past_leaderboard_months.append(leaderboard_month_date)
+        leaderboard_month_date = add_months(leaderboard_month_date, 1)
+
+    context = {
+        'current_year': str(now.year),
+        'current_month': str(now.month).zfill(2),
+        'past_leaderboard_months': past_leaderboard_months,
+    }
     return render(request, 'leaderboards_landing.html', context)
 
 

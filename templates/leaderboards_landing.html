@@ -15,9 +15,18 @@
 <label for="select-timespan">Timespan</label>
 
 <ul id="select-timespan" class="nav nav-pills selector">
-    <li data-type="{{ current_year }}{{ current_month }}" class="active"><a class="select timespan" href="#">This Month</a></li>
+    <li data-type="{{ current_year }}{{ current_month }}" class="active"><a class="select timespan current-month" href="#">This Month</a></li>
     <li data-type="all"><a class="select timespan" href="#">All Time</a></li>
 </ul>
+
+<label for="select-past-leaderboard-months">Previous Months</label>
+
+<select id="select-past-leaderboard-months">
+    <option value="0">Select Previous Month</option>
+    {% for past_leaderboard_month in past_leaderboard_months %}
+    <option value="{{ past_leaderboard_month.year }}{{ past_leaderboard_month.month|stringformat:"02d" }}">{{ past_leaderboard_month|date:"M" }} {{ past_leaderboard_month|date:"Y" }}</option>
+    {% endfor %}
+</select>
 
 <div id="leaderboard-container"></div>
 

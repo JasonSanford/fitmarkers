@@ -1,3 +1,4 @@
+import calendar
 import datetime
 
 from pytz import timezone
@@ -18,3 +19,11 @@ def get_first_day_of_month(user):
     now = datetime.datetime.now(user_timezone)
     first_of_month = datetime.datetime(now.year, now.month, 1, tzinfo=user_timezone)
     return first_of_month
+
+
+def add_months(date, months):
+    month = date.month - 1 + months
+    year = date.year + month / 12
+    month = month % 12 + 1
+    day = min(date.day, calendar.monthrange(year, month)[1])
+    return datetime.date(year, month,day)
