@@ -165,5 +165,6 @@ def workout(request, workout_id):
         'workout_markers_geojson': json.dumps(workout_markers_geojson),
         'workout_marker_count': len(workout_markers),
         'duration': workout.duration,
+        'distance_mi': '%.2f' % workout.length(unit='mi')
     }
     return render(request, 'user_workout.html', context)
