@@ -67,7 +67,7 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
             header_height = $('#workout-name').outerHeight() + dePixel($('#workout-name').css('margin-top')) + dePixel($('#workout-name').css('margin-bottom'));
             available_height_for_map = fillable_space - header_height;
 
-        $('#map-container').css('height', available_height_for_map);
+        $('#map-wrapper').css('height', available_height_for_map);
     }
 
     $(window).on('resize', fillWindow);

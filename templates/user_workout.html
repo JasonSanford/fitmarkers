@@ -4,7 +4,14 @@
 <div id="workout-header">
 <h2 id="workout-name">{{ workout.name }}</h2>
 </div>
-<div id="map-container" style="height: 500px;" class="map-container"></div>
+<div id="map-wrapper">
+    <div id="map-container" class="map-container"></div>
+    <div id="workout-stats">
+        <h4>Workout Stats</h4>
+        <p><strong>Fitmarkers: </strong>{{ workout_marker_count }}</p>
+        <p><strong>Duration: </strong>{{ duration }}s</p>
+    </div>
+</div>
 
 {% endblock %}
 
@@ -20,5 +27,36 @@ fm.workout = {{ workout_geojson|safe }};
 
 {% block css %}
 <link href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" rel="stylesheet">
-<style type="text/css">.navbar {margin-bottom: 0;} #workout-header h2 {margin-top: 10px; text-align: center;} #navbar {position: relative;} body {padding-top: 0;}</style>
+<style type="text/css">
+    .navbar {
+        margin-bottom: 0;
+    }
+    #workout-header h2 {
+        margin-top: 10px;
+        text-align: center;
+    }
+    #navbar {
+        position: relative;
+    }
+    #map-wrapper {
+        height: 500px;
+        position: relative;
+    }
+    #map-container {
+        height: 100%;
+    }
+    #workout-stats {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        margin: 10px;
+        background-color: rgba(17, 17, 17, 0.65);
+        border-radius: 7px;
+        padding: 10px;
+        color: #e0e0e0;
+    }
+    body {
+        padding-top: 0;
+    }
+</style>
 {% endblock%}
