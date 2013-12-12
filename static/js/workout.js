@@ -141,4 +141,31 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
             }
         }
     });
+
+    function formatDuration() {
+        var duration = parseInt($('#duration').data('seconds'), 10);
+
+        var hours = Math.floor(duration / (60 * 60));
+
+        var divisor_for_minutes = duration % (60 * 60);
+        var minutes = Math.floor(divisor_for_minutes / 60);
+
+        var divisor_for_seconds = divisor_for_minutes % 60;
+        var seconds = Math.ceil(divisor_for_seconds);
+
+        var output = '';
+        if (hours) {
+            output += hours + 'h ';
+        }
+        if (minutes || hours) {
+            output += minutes + 'm ';
+        }
+        if (seconds || minutes || hours) {
+            output += seconds + 's';
+        }
+        $('#duration').text(output);
+    }
+
+    formatDuration();
+
 }());

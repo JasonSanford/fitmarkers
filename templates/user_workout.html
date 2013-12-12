@@ -9,7 +9,7 @@
     <div id="workout-stats">
         <h4>Workout Stats</h4>
         <p><strong>Fitmarkers: </strong>{{ workout_marker_count }}</p>
-        <p><strong>Duration: </strong>{{ duration }}s</p>
+        <p><strong>Duration: </strong><span id="duration" data-seconds="{{ duration }}">{{ duration }}</span></p>
     </div>
 </div>
 
@@ -57,6 +57,7 @@ fm.workout = {{ workout_geojson|safe }};
     }
     body {
         padding-top: 0;
+        padding-bottom: 0;
     }
 </style>
 {% endblock%}
