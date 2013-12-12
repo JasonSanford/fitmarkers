@@ -58,6 +58,22 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
 });
 
 (function() {
+    function fillWindow() {
+        function dePixel(css_text) {
+            return parseInt(css_text.split('px')[0], 10);
+        }
+
+        var fillable_space = $(window).outerHeight() - $('#navbar').outerHeight(),
+            header_height = $('#workout-name').outerHeight() + dePixel($('#workout-name').css('margin-top')) + dePixel($('#workout-name').css('margin-bottom'));
+            available_height_for_map = fillable_space - header_height;
+
+        $('#map-container').css('height', available_height_for_map);
+    }
+
+    $(window).on('resize', fillWindow);
+
+    fillWindow();
+
     var excludeIds = [];
     for (var _wm in fm.workout_markers.features) {
         wm = fm.workout_markers.features[_wm];

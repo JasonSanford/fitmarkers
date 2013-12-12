@@ -1,8 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'full_width.html' %}
 
 {% block content %}
-<h2>{{ workout.name }}</h2>
-
+<div id="workout-header">
+<h2 id="workout-name">{{ workout.name }}</h2>
+</div>
 <div id="map-container" style="height: 500px;" class="map-container"></div>
 
 {% endblock %}
@@ -19,4 +20,5 @@ fm.workout = {{ workout_geojson|safe }};
 
 {% block css %}
 <link href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" rel="stylesheet">
+<style type="text/css">.navbar {margin-bottom: 0;} #workout-header h2 {margin-top: 10px; text-align: center;} #navbar {position: relative;} body {padding-top: 0;}</style>
 {% endblock%}
