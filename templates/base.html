@@ -21,8 +21,13 @@
                 </div>
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="/">Home</a></li>
-                        <li><a href="{% url 'leaderboards_landing' %}">Leaderboards</a></li>
+                        {% if user.is_anonymous %}
+                        <li{% if tab == 'home' %} class="active"{% endif %}><a href="/">Home</a></li>
+                        {% else %}
+                        <li{% if tab == 'dashboard' %} class="active"{% endif %}><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
+                        {% endif %}
+                        <li{% if tab == 'leaderboards' %} class="active"{% endif %}><a href="{% url 'leaderboards_landing' %}">Leaderboards</a></li>
+                        <li{% if tab == 'about' %} class="active"{% endif %}><a href="{% url 'about' %}">About</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         {% if user.is_anonymous %}

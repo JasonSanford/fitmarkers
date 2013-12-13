@@ -28,6 +28,7 @@ def leaderboards_landing(request):
         'current_year': str(now.year),
         'current_month': str(now.month).zfill(2),
         'past_leaderboard_months': past_leaderboard_months,
+        'tab': 'leaderboards',
     }
     return render(request, 'leaderboards_landing.html', context)
 

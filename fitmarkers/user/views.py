@@ -54,6 +54,7 @@ def dashboard(request):
     context = {
         'all_time_leaderboards': {},
         'monthly_leaderboards': {},
+        'tab': 'dashboard',
     }
 
     now = datetime.datetime.now()
