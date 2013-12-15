@@ -54,6 +54,7 @@ def dashboard(request):
     context = {
         'all_time_leaderboards': {},
         'monthly_leaderboards': {},
+        'tab': 'dashboard',
     }
 
     now = datetime.datetime.now()
@@ -162,6 +163,9 @@ def workout(request, workout_id):
     context = {
         'workout': workout,
         'workout_geojson': workout.geojson,
-        'workout_markers_geojson': json.dumps(workout_markers_geojson)
+        'workout_markers_geojson': json.dumps(workout_markers_geojson),
+        'workout_marker_count': len(workout_markers),
+        'duration': workout.duration,
+        'distance_mi': '%.2f' % workout.length(unit='mi')
     }
     return render(request, 'user_workout.html', context)

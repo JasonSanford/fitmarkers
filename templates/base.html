@@ -6,15 +6,10 @@
         <title>FitMarkers</title>
         <link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
         <link href="{{ STATIC_URL }}css/base.css" rel="stylesheet">
-        <style type="text/css">
-            body {
-                padding-top: 70px;
-            }
-        </style>
         {% block css%}{% endblock %}
     </head>
     <body>
-        <div class="navbar navbar-default navbar-fixed-top">
+        <div id="navbar" class="navbar navbar-default navbar-fixed-top">
             <div class="container">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -26,8 +21,13 @@
                 </div>
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li class="active"><a href="/">Home</a></li>
-                        <li><a href="{% url 'leaderboards_landing' %}">Leaderboards</a></li>
+                        {% if user.is_anonymous %}
+                        <li{% if tab == 'home' %} class="active"{% endif %}><a href="/">Home</a></li>
+                        {% else %}
+                        <li{% if tab == 'dashboard' %} class="active"{% endif %}><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
+                        {% endif %}
+                        <li{% if tab == 'leaderboards' %} class="active"{% endif %}><a href="{% url 'leaderboards_landing' %}">Leaderboards</a></li>
+                        <li{% if tab == 'about' %} class="active"{% endif %}><a href="{% url 'about' %}">About</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         {% if user.is_anonymous %}
@@ -47,9 +47,12 @@
             </div>
         </div>
 
-        <div class="container">
-            {% block content %}{% endblock %}
-        </div>
+        {% block above_content %}{% endblock %}
+
+        {% block content %}{% endblock %}
+
+        {% block below_content %}{% endblock %}
+
         <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
         <script src="{{ STATIC_URL }}js/bootstrap.js"></script>
         <script>

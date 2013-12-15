@@ -58,6 +58,22 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
 });
 
 (function() {
+    function fillWindow() {
+        function dePixel(css_text) {
+            return parseInt(css_text.split('px')[0], 10);
+        }
+
+        var fillable_space = $(window).outerHeight() - $('#navbar').outerHeight(),
+            header_height = $('#workout-name').outerHeight() + dePixel($('#workout-name').css('margin-top')) + dePixel($('#workout-name').css('margin-bottom'));
+            available_height_for_map = fillable_space - header_height;
+
+        $('#map-wrapper').css('height', available_height_for_map);
+    }
+
+    $(window).on('resize', fillWindow);
+
+    fillWindow();
+
     var excludeIds = [];
     for (var _wm in fm.workout_markers.features) {
         wm = fm.workout_markers.features[_wm];
@@ -125,4 +141,31 @@ lvector.FitMarkers = lvector.GeoJSONLayer.extend({
             }
         }
     });
+
+    function formatDuration() {
+        var duration = parseInt($('#duration').data('seconds'), 10);
+
+        var hours = Math.floor(duration / (60 * 60));
+
+        var divisor_for_minutes = duration % (60 * 60);
+        var minutes = Math.floor(divisor_for_minutes / 60);
+
+        var divisor_for_seconds = divisor_for_minutes % 60;
+        var seconds = Math.ceil(divisor_for_seconds);
+
+        var output = '';
+        if (hours) {
+            output += hours + 'h ';
+        }
+        if (minutes || hours) {
+            output += minutes + 'm ';
+        }
+        if (seconds || minutes || hours) {
+            output += seconds + 's';
+        }
+        $('#duration').text(output);
+    }
+
+    formatDuration();
+
 }());

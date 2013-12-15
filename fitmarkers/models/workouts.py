@@ -7,6 +7,10 @@ from ..utils import get_last_monday
 
 
 class Workout(behaviors.Timestampable, geo_models.Model):
+    def __init__(self, *args, **kwargs):
+        self._length = {}
+        super(Workout, self).__init__(*args, **kwargs)
+
     TYPE_RUN = 1
     TYPE_RIDE = 2
     TYPE_WALK = 3
@@ -55,6 +59,18 @@ class Workout(behaviors.Timestampable, geo_models.Model):
     @property
     def name(self):
         return 'A {0} from {1} on {2}'.format(self.get_type_display(), self.get_provider_display(), self.display_date)
+
+    def length(self, unit='mi'):
+        # Distances can be expensive to compute with GeoDjango, let's try to
+        # get the cached value
+        if unit in self._length:
+            return self._length[unit]
+        workouts = Workout.objects.filter(id=self.id).length()
+        workout = workouts[0]
+        measure = workout.length
+        _length = getattr(measure, unit)
+        self._length[unit] = _length
+        return _length
 
     class Meta:
         app_label = 'fitmarkers'
