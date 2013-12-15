@@ -25,6 +25,7 @@ $(function () {
         event.preventDefault();
         var $this = $(this),
             $parent = $this.parent();
+        $('#select-past-leaderboard-months').val('0');
         if ($parent.hasClass('active')) {
             return;
         } else {
@@ -38,7 +39,6 @@ $(function () {
         if (parseInt($this.val(), 10) === 0) {
             var $current_month = $('.selector').find('a.select.current-month');
             $current_month.parent().addClass('active');
-            //$('.selector').trigger('click');
         } else {
             $('.timespan.select').each(function (i, o) {
                 $(o).parent().removeClass('active');
