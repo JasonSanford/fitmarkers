@@ -1,5 +1,33 @@
 {% extends 'centered.html' %}
 
 {% block content %}
-yo dawg
+<div class="jumbotron">
+    <div class="jumbotron-content">
+        <h1>FitMarkers</h1>
+        <p>A reallly, really sweet short sentence about this product!</p>
+        <p><a class="btn btn-default btn-lg" href="{% url 'about' %}">Learn more</a> <a class="btn btn-primary btn-lg" href="/login/mapmyfitness">Login with MapMyFitness »</a></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block css %}
+<style type="text/css">
+.jumbotron {
+    background-image: url({{ STATIC_URL }}img/hero.jpg);
+}
+.jumbotron-content {
+    width: 460px;
+    background-color: rgba(17, 17, 17, 0.65);
+    border-radius: 8px;
+    padding: 15px 30px;
+}
+.jumbotron-content h1 {
+    color: #e0e0e0;
+}
+.jumbotron-content p {
+    color: #e0e0e0;
+    line-height: 1.3em;
+    margin: 8px 0 12px;
+}
+</style>
 {% endblock %}
