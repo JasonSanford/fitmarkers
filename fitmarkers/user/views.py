@@ -7,7 +7,7 @@ from django.db.models import Count
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
-from pytz import common_timezones
+from pytz import common_timezones, timezone
 
 from .forms import UserProfileForm
 from ..leaderboards.utils import get_user_rank, get_leaderboard_count, get_user_score
@@ -118,7 +118,7 @@ def monthly_workouts(request):
     workouts = [
         {
             'id': w.id,
-            'date': w.start_datetime.strftime('%b %d, %Y'),
+            'date': w.start_datetime.astimezone(timezone(request.user.profile.timezone)).strftime('%b %d, %Y'),
             'type': w.get_type_display(),
             'marker_count': w.workout_marker_count,
             'url': reverse('user_workout', args=[w.id])
