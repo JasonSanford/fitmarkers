@@ -15,6 +15,7 @@ def deploy(environment='production'):
         run('git reset --hard origin/master')
         run(activate_venv + 'pip install -r requirements.txt')
         run(activate_venv + run_tests_command)
+        run(activate_venv + 'python manage.py collectstatic --noinput')
         run('sudo supervisorctl restart fitmarkers_web')
         run('sudo supervisorctl restart fitmarkers_celery')
 
