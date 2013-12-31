@@ -27,3 +27,9 @@ def add_months(date, months):
     month = month % 12 + 1
     day = min(date.day, calendar.monthrange(year, month)[1])
     return datetime.date(year, month,day)
+
+def get_timezone_for_user(user):
+    if user.is_authenticated():
+        return user.profile.timezone
+    else:
+        return 'America/Denver'

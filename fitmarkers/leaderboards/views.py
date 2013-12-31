@@ -5,17 +5,20 @@ import logging
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.utils.timezone import now as d_now
+from pytz import timezone
 
 from fitmarkers import keyval
 from fitmarkers.leaderboards import START_DATE as leaderboards_start_date
-from fitmarkers.utils import add_months
+from fitmarkers.utils import add_months, get_timezone_for_user
 
 
 logger = logging.getLogger(__name__)
 
 
 def leaderboards_landing(request):
-    now = datetime.datetime.now()
+    user_timezone = get_timezone_for_user(request.user)
+    now = d_now().astimezone(timezone(user_timezone))
 
     leaderboard_month_date = leaderboards_start_date
     current_month_date = datetime.date(now.year, now.month, 1)
