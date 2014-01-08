@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>FitMarkers</title>
-        <link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
         <link href="{{ STATIC_URL }}css/base.css" rel="stylesheet">
         {% block css%}{% endblock %}
     </head>
@@ -54,7 +54,7 @@
         {% block below_content %}{% endblock %}
 
         <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-        <script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
         <script>
         window.fm = {
             STATIC_URL: '{{ STATIC_URL }}'
