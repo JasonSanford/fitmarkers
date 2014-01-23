@@ -3,6 +3,39 @@
 {% block content %}
 <h2>About</h2>
 
+<p>
+    FitMarkers encourages you to add some diversity to your workouts. While you workout, you'll collect FitMarkers worth varying amounts of points. Earn more points by running, riding or walking in new or scenic places. But, be sure to mix it up because you'll only earn the points from any single FitMarker once in a month.
+</p>
+
+<h3>How it Works</h3>
+
+<p>
+    FitMarkers syncs with your MapMyFitness account. If you don't already have an account, <a href="https://www.mapmyfitness.com/auth/signup/">sign up for free</a>.
+</p>
+
+<p>
+    Once you're signed up with MapMyFitness, <a href="/login/mapmyfitness">log into FitMarkers</a>. You'll be asked to grant access to our app to view your routes and workouts. We'll need these to see where you've been working out.
+</p>
+
+<p style="text-align: center;"><img src="{{ STATIC_URL }}img/oauth.png" /></p>
+
+<p>Once you're signed up, we'll start gathering your workouts (starting with the current month).</p>
+
+<p style="text-align: center;"><img src="{{ STATIC_URL }}img/workouts.png" /></p>
+
+<p>Click a workout to get some details, like how far you went and how many FitMarkers you crossed. The "starred" markers are the ones you crossed, and got credit for, on this specific workout.</p>
+
+<p style="text-align: center;"><img src="{{ STATIC_URL }}img/workout.png" /></p>
+
+<p>On any workout you might cross many FitMarkers worth varying amounts of points. If you haven't already crossed that FitMarker during the current month, you'll get points for it and will be added to the leaaderboard.</p>
+
+<p>You can filter leaderboards by a specific month and/or workout type:</p>
+
+<p style="text-align: center;"><img src="{{ STATIC_URL }}img/leaderboard-dec.png" /></p>
+
+<p>or view the all time leaderboard counting one or all workout types:</p>
+
+<p style="text-align: center;"><img src="{{ STATIC_URL }}img/leaderboard-all.png" /></p>
 
 {% endblock %}
 
